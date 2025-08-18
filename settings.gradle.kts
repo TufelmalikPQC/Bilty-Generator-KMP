@@ -25,6 +25,9 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+
+        // ADD THE OFFICIAL JOGAMP REPOSITORY INSTEAD
+        maven("https://jogamp.org/deployment/maven/")
     }
 }
 

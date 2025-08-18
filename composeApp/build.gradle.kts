@@ -10,6 +10,8 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.navigation.safeargs)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -19,7 +21,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -30,9 +32,9 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     jvm()
-    
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         outputModuleName.set("composeApp")
@@ -52,11 +54,14 @@ kotlin {
         }
         binaries.executable()
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+
+            // Html to PDF
+            implementation(libs.html.to.pdf.convertor)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -67,6 +72,20 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            // Compose-Navigation
+            implementation(libs.navigation.compose)
+
+            // Serialization
+            implementation(libs.kotlinx.serialization.json)
+
+            // Web-view
+            implementation(libs.compose.webview.multiplatform)
+
+        }
+        iosMain.dependencies {
+            // Ktor iOS engine
+            implementation(libs.ktor.client.darwin)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -74,6 +93,8 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+            // Html to PDF
+            implementation(libs.openhtmltopdf.pdfbox)
         }
     }
 }
