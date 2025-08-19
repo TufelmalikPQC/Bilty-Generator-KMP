@@ -1,16 +1,28 @@
 package com.bilty.generator.uiToolKit
 
 import com.bilty.generator.bridge.getImageAsBase64
+import com.bilty.generator.getPlatform
 import com.bilty.generator.model.data.BiltyChargesTable
 import com.bilty.generator.model.data.RoadLineDeliveryReceipt
 
-fun generateRoadLineDeliveryReceipt(receipt: RoadLineDeliveryReceipt, isPreviewWithImageBitmap:  Boolean): String {
-    val receiptImageBase64 = getImageAsBase64("images/transport_roadline_invoice.jpeg")
+fun generateRoadLineDeliveryReceipt(
+    receipt: RoadLineDeliveryReceipt,
+    isPreviewWithImageBitmap: Boolean
+): String {
+
+    var imagePath = "images/transport_roadline_invoice.jpeg"
+    if(getPlatform().name.contains("Android")){
+        imagePath  = "transport_roadline_invoice.jpeg"
+    }
+    val receiptImageBase64 = getImageAsBase64(imagePath)
+    val zoomLevel = 0.80
+
     val backgroundImage = if (isPreviewWithImageBitmap) {
         "background-image: url('data:image/jpeg;base64,$receiptImageBase64');"
     } else {
         "background-color: #f0f0f0; border: 2px dashed red;"
     }
+
     // Helper to format currency values
     fun formatCurrency(value: Double) = String.format("%.2f", value)
 
@@ -35,6 +47,8 @@ fun generateRoadLineDeliveryReceipt(receipt: RoadLineDeliveryReceipt, isPreviewW
                     margin: 0;
                     padding: 0;
                     font-family: Arial, sans-serif;
+                    zoom: $zoomLevel;
+                    transform: scale($zoomLevel)
                     overflow: hidden; /* Prevents scrollbars and content spillover */
                 }
 

@@ -122,7 +122,7 @@ fun PrintPreviewScreen() {
                             Spacer(Modifier.height(4.dp))
                             // The background color helps confirm the composable is being laid out.
                             HtmlView(
-                                html = receiptHtmlContent,
+                                html = receiptHtmlContentWithImage,
                                 modifier = Modifier.fillMaxSize().background(Color.LightGray.copy(alpha = 0.2f))
                             )
                         }
@@ -137,7 +137,7 @@ fun PrintPreviewScreen() {
                             Text("Image Version", fontSize = 12.sp, color = Color.Gray)
                             Spacer(Modifier.height(4.dp))
                             HtmlView(
-                                html = receiptHtmlContentWithImage,
+                                html = receiptHtmlContent,
                                 modifier = Modifier.fillMaxSize().background(Color.LightGray.copy(alpha = 0.2f))
                             )
                         }
