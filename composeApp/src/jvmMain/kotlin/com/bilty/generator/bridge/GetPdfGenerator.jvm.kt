@@ -4,14 +4,11 @@ import com.bilty.generator.model.constants.PDF
 import com.bilty.generator.model.data.RoadLineDeliveryReceipt
 import com.bilty.generator.model.interfaces.PdfGenerator
 import com.bilty.generator.uiToolKit.generateRoadLineDeliveryReceipt
-import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder
-import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.PageSizeUnits
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
-
 
 actual fun getPdfGenerator(): PdfGenerator = PdfGeneratorDesktop()
 
@@ -19,26 +16,36 @@ class PdfGeneratorDesktop : PdfGenerator {
     override suspend fun generatePdf(
         receipt: RoadLineDeliveryReceipt,
         isPreviewWithImageBitmap: Boolean
-    ): Boolean =
-        withContext(Dispatchers.IO) {
+    ): ByteArray? = withContext(Dispatchers.IO) {
+        return@withContext try {
             val html = generateRoadLineDeliveryReceipt(receipt, isPreviewWithImageBitmap)
+
+            // 1. Generate the PDF into memory first
+            val outputStream = java.io.ByteArrayOutputStream()
+            PdfRendererBuilder().run {
+                withHtmlContent(html, null)
+                toStream(outputStream)
+                run()
+            }
+            val pdfData = outputStream.toByteArray()
+
+            // 2. Now, save the generated data to a file
             val outputPath =
                 System.getProperty("user.home") + PDF.pdfSavePath(receipt.receiptNumber)
             val file = File(outputPath)
-            println("PDF saved to: ${file.absolutePath}")
-            return@withContext try {
-                val pdfRendererBuilder = PdfRendererBuilder()
-                pdfRendererBuilder.run {
-                    withHtmlContent(html, null)
-                    toStream(FileOutputStream(file))
-                    run()
-                }
+            // Ensure parent directories exist
+            file.parentFile?.mkdirs()
 
-
-                true
-            } catch (e: Exception) {
-                e.printStackTrace()
-                false
+            FileOutputStream(file).use { fileStream ->
+                fileStream.write(pdfData)
             }
+            println("✅ PDF saved to: ${file.absolutePath}")
+
+            // 3. Finally, return the data for printing
+            pdfData
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
+    }
 }

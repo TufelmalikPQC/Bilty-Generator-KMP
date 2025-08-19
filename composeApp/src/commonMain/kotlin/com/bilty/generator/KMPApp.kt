@@ -21,7 +21,7 @@ fun KMPApp() {
             startDestination = AppRoutes.PrintPreviewScreen
         ) {
             composable<AppRoutes.PrintPreviewScreen> {
-                PrintPreviewScreen()
+                PrintPreviewScreen(navController)
             }
 
             composable<AppRoutes.PrinterScreen> {

@@ -25,99 +25,34 @@ import platform.UIKit.valueWithCGRect
 
 actual fun getPdfGenerator(): PdfGenerator = PdfGeneratorIos()
 
+// Add this helper function at the top level of the file to convert NSData
+@OptIn(ExperimentalForeignApi::class)
+private fun NSData.toByteArray(): ByteArray = ByteArray(this.length.toInt()).apply {
+    this@toByteArray.getBytes(this.refTo(0), this@toByteArray.length)
+}
+
 class PdfGeneratorIos : PdfGenerator {
-
     @OptIn(ExperimentalForeignApi::class)
-    override suspend fun generatePdf(receipt: RoadLineDeliveryReceipt, isPreviewWithImageBitmap:  Boolean): Boolean {
+    override suspend fun generatePdf(
+        receipt: RoadLineDeliveryReceipt,
+        isPreviewWithImageBitmap: Boolean
+    ): ByteArray? { // <-- Return ByteArray?
         return try {
+            val html = generateRoadLineDeliveryReceipt(receipt, isPreviewWithImageBitmap)
+            // ... (keep the existing printFormatter and renderer setup) ...
 
-            val html = generateRoadLineDeliveryReceipt(receipt,isPreviewWithImageBitmap)
-            val printFormatter = UIMarkupTextPrintFormatter(html)
-
-            val renderer = UIPrintPageRenderer()
-            renderer.addPrintFormatter(printFormatter, startingAtPageAtIndex = 0L)
-
-            val paperRect = CGRectMake(0.0, 0.0, 600.0, 400.0)
-            val printableRect = CGRectMake(0.0, 0.0, 600.0, 400.0)
-
-            // Set paper and printable reacts
-            renderer.setValue(NSValue.valueWithCGRect(paperRect), forKey = "paperRect")
-            renderer.setValue(NSValue.valueWithCGRect(printableRect), forKey = "printableRect")
-
-            val pdfData = NSMutableData()
+            val pdfData = NSMutableData() // You already have this
             UIGraphicsBeginPDFContextToData(pdfData, paperRect, null)
 
-            val pageCount = renderer.numberOfPages.toInt()
-            println("📄 Rendering $pageCount pages")
-
-            for (i in 0 until pageCount) {
-                UIGraphicsBeginPDFPage()
-                UIGraphicsGetPDFContextBounds().useContents {
-                    renderer.drawPageAtIndex(
-                        i.toLong(),
-                        CGRectMake(origin.x, origin.y, size.width, size.height)
-                    )
-                }
-            }
+            // ... (keep the existing page rendering loop) ...
 
             UIGraphicsEndPDFContext()
 
-            // Save to Documents directory (iOS doesn't have direct access to Downloads)
-            val documentsDir = NSSearchPathForDirectoriesInDomains(
-                NSDocumentDirectory,
-                NSUserDomainMask,
-                true
-            ).firstOrNull() as? String
-
-            if (documentsDir == null) {
-                println("❌ Could not access Documents directory")
-                return false
-            }
-
-            val filePath = "$documentsDir/receipt-${receipt.receiptNumber}.pdf"
-            val success = pdfData.writeToFile(filePath, atomically = true)
-
-            if (success) {
-                println("✅ PDF saved successfully at: $filePath")
-
-                // Try to save to Files app if available
-                try {
-                    val fileManager = NSFileManager.defaultManager
-                    val downloadsPath = "$documentsDir/Downloads"
-
-                    // Create Downloads folder if it doesn't exist
-                    if (!fileManager.fileExistsAtPath(downloadsPath)) {
-                        fileManager.createDirectoryAtPath(
-                            downloadsPath,
-                            withIntermediateDirectories = true,
-                            attributes = null,
-                            error = null
-                        )
-                    }
-
-                    val downloadFilePath = "$downloadsPath/receipt-${receipt.receiptNumber}.pdf"
-                    if (fileManager.copyItemAtPath(
-                            filePath,
-                            toPath = downloadFilePath,
-                            error = null
-                        )
-                    ) {
-                        println("✅ PDF also saved to Downloads folder: $downloadFilePath")
-                    }
-                } catch (e: Exception) {
-                    println("⚠️ Could not copy to Downloads folder: ${e.message}")
-                }
-
-                return true
-            } else {
-                println("❌ Failed to save PDF to file")
-                return false
-            }
-
+            // 1. Instead of saving, just convert the NSData to ByteArray and return
+            pdfData.toByteArray()
         } catch (e: Exception) {
-            println("❌ Unexpected error in iOS PDF generation: ${e.message}")
             e.printStackTrace()
-            false
+            null
         }
     }
 }

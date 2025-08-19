@@ -2,11 +2,10 @@ package com.bilty.generator.bridge
 
 
 import android.annotation.SuppressLint
-import android.os.Environment
-import com.bilty.generator.uiToolKit.generateRoadLineDeliveryReceipt
 import com.bilty.generator.model.data.RoadLineDeliveryReceipt
-import com.bilty.generator.utiles.androidContextActivity
 import com.bilty.generator.model.interfaces.PdfGenerator
+import com.bilty.generator.uiToolKit.generateRoadLineDeliveryReceipt
+import com.bilty.generator.utiles.androidContextActivity
 import io.github.mddanishansari.html_to_pdf.HtmlToPdfConvertor
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -16,49 +15,39 @@ import java.io.File
 actual fun getPdfGenerator(): PdfGenerator = PdfGeneratorAndroid()
 
 class PdfGeneratorAndroid : PdfGenerator {
-
     @SuppressLint("SetJavaScriptEnabled")
-    override suspend fun generatePdf(receipt: RoadLineDeliveryReceipt, isPreviewWithImageBitmap:  Boolean): Boolean =
-        withContext(Dispatchers.Main) {
+    override suspend fun generatePdf(
+        receipt: RoadLineDeliveryReceipt,
+        isPreviewWithImageBitmap: Boolean
+    ): ByteArray? = withContext(Dispatchers.Main) { // <-- Return ByteArray?
+        val html = generateRoadLineDeliveryReceipt(receipt, isPreviewWithImageBitmap)
 
-            val html = generateRoadLineDeliveryReceipt(receipt,isPreviewWithImageBitmap)
-            val result = CompletableDeferred<Boolean>()
+        // Use a CompletableDeferred that can hold a nullable ByteArray
+        val result = CompletableDeferred<ByteArray?>()
 
-            val context = androidContextActivity
-            if (context == null) {
-                println("❌ No Activity context available.")
-                return@withContext false
-            }
+        val context = androidContextActivity ?: return@withContext null
 
-            val state = Environment.getExternalStorageState()
-            if (state != Environment.MEDIA_MOUNTED) {
-                println("❌ External storage not available")
-                return@withContext false
-            }
+        // Save to a temporary file in the app's cache directory
+        val file = File(context.cacheDir, "temp_receipt.pdf")
 
-            val downloadsDir =
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            if (!downloadsDir.exists()) downloadsDir.mkdirs()
-            val file = File(downloadsDir, "receipt-${receipt.receiptNumber}.pdf")
-
-            val htmlToPdfConvertor = HtmlToPdfConvertor(context)
-
-            // Optional: Enable JS if your HTML needs it
-            htmlToPdfConvertor.setJavaScriptEnabled(true)
-
-            htmlToPdfConvertor.convert(
+        HtmlToPdfConvertor(context).apply {
+            setJavaScriptEnabled(true)
+            convert(
                 pdfLocation = file,
                 htmlString = html,
-                onPdfGenerationFailed = { exception ->
-                    println("❌ Error during PDF generation: ${exception.message}")
-                    result.complete(false)
+                onPdfGenerationFailed = {
+                    result.complete(null) // Complete with null on failure
                 },
                 onPdfGenerated = { pdfFile ->
-                    println("✅ PDF saved successfully at: ${pdfFile.absolutePath}")
-                    result.complete(true)
+                    // 1. On success, read the file's bytes
+                    val pdfData = pdfFile.readBytes()
+                    // 2. Clean up the temporary file
+                    pdfFile.delete()
+                    // 3. Complete with the ByteArray data
+                    result.complete(pdfData)
                 }
             )
-
-            result.await()
         }
+        result.await()
+    }
 }

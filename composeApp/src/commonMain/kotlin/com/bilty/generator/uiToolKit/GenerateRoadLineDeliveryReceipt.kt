@@ -11,8 +11,8 @@ fun generateRoadLineDeliveryReceipt(
 ): String {
 
     var imagePath = "images/transport_roadline_invoice.jpeg"
-    if(getPlatform().name.contains("Android")){
-        imagePath  = "transport_roadline_invoice.jpeg"
+    if (getPlatform().name.contains("Android")) {
+        imagePath = "transport_roadline_invoice.jpeg"
     }
     val receiptImageBase64 = getImageAsBase64(imagePath)
     val zoomLevel = 0.80
@@ -22,9 +22,6 @@ fun generateRoadLineDeliveryReceipt(
     } else {
         "background-color: #f0f0f0; border: 2px dashed red;"
     }
-
-    // Helper to format currency values
-    fun formatCurrency(value: Double) = String.format("%.2f", value)
 
     return """
         <!DOCTYPE html>
@@ -110,44 +107,28 @@ fun generateRoadLineDeliveryReceipt(
                     <div class="form-field" style="left: 245px; top: 693px;">${receipt.pMarka}</div>
 
                     <div class="form-field" style="left: 920px; top: 213px; width: 140px; text-align: right;">${
-        formatCurrency(
-            receipt.biltyChargesTable.freight
-        )
+        receipt.biltyChargesTable.freight
     }</div>
                     <div class="form-field" style="left: 920px; top: 285px; width: 140px; text-align: right;">${
-        formatCurrency(
-            receipt.biltyChargesTable.charity
-        )
+        receipt.biltyChargesTable.charity
     }</div>
                     <div class="form-field" style="left: 920px; top: 355px; width: 140px; text-align: right;">${
-        formatCurrency(
-            receipt.biltyChargesTable.handling
-        )
+        receipt.biltyChargesTable.handling
     }</div>
                     <div class="form-field" style="left: 920px; top: 421px; width: 140px; text-align: right;">${
-        formatCurrency(
-            receipt.biltyChargesTable.delivery
-        )
+        receipt.biltyChargesTable.delivery
     }</div>
                     <div class="form-field" style="left: 920px; top: 490px; width: 140px; text-align: right;">${
-        formatCurrency(
-            receipt.biltyChargesTable.ddCharges
-        )
+        receipt.biltyChargesTable.ddCharges
     }</div>
                     <div class="form-field" style="left: 920px; top: 558px; width: 140px; text-align: right;">${
-        formatCurrency(
-            receipt.biltyChargesTable.demurrage
-        )
+        receipt.biltyChargesTable.demurrage
     }</div>
                     <div class="form-field" style="left: 920px; top: 623px; width: 140px; text-align: right;">${
-        formatCurrency(
-            receipt.biltyChargesTable.otherCharges
-        )
+        receipt.biltyChargesTable.otherCharges
     }</div>
                     <div class="form-field" style="left: 920px; top: 664px; width: 140px; text-align: right; font-weight: bold; font-size: 26px;">${
-        formatCurrency(
-            receipt.biltyChargesTable.grandTotal
-        )
+        receipt.biltyChargesTable.grandTotal
     }</div>
                 </div>
             </body>

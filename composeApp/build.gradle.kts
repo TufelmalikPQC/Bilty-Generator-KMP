@@ -82,6 +82,8 @@ kotlin {
             // Web-view
             implementation(libs.compose.webview.multiplatform)
 
+            // Material
+            implementation(compose.materialIconsExtended)
         }
         iosMain.dependencies {
             // Ktor iOS engine
@@ -95,6 +97,9 @@ kotlin {
             implementation(libs.kotlinx.coroutinesSwing)
             // Html to PDF
             implementation(libs.openhtmltopdf.pdfbox)
+
+            // print pdf
+            implementation(libs.pdfbox)
         }
     }
 }
