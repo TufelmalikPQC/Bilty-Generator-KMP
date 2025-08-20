@@ -84,6 +84,8 @@ kotlin {
 
             // Material
             implementation(compose.materialIconsExtended)
+
+            implementation(libs.ktor.utils)
         }
         iosMain.dependencies {
             // Ktor iOS engine

@@ -1,69 +1,101 @@
 package com.bilty.generator.modules.preview
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Print
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.bilty.generator.getPlatform
+import com.bilty.generator.model.constants.Constants
 import com.bilty.generator.modules.AppRoutes
-import com.bilty.generator.uiToolKit.HtmlView
+import com.bilty.generator.modules.preview.componetnts.PrintPreviewCard
+import com.bilty.generator.modules.print.PrinterViewModel
+import com.bilty.generator.uiToolKit.PreviewTabs
+import com.bilty.generator.uiToolKit.PrintOptionsBottomSheet
 import com.bilty.generator.uiToolKit.generateRoadLineDeliveryReceipt
 import com.bilty.generator.uiToolKit.getDemoRoadLineDeliveryReceipt
+import com.bilty.generator.uiToolKit.getHtmlPageZoomLevel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PrintPreviewScreen(navController: NavHostController) {
     var showPreview by remember { mutableStateOf(true) }
+    var receiptHtmlContent by remember { mutableStateOf<String?>(null) }
+    var receiptHtmlContentWithImage by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
 
-    // Generate the HTML content from your logic.
-    val receiptHtmlContent = remember {
-        generateRoadLineDeliveryReceipt(
-            getDemoRoadLineDeliveryReceipt(),
-            isPreviewWithImageBitmap = false
-        )
-    }
-    val receiptHtmlContentWithImage = remember {
-        generateRoadLineDeliveryReceipt(
-            getDemoRoadLineDeliveryReceipt(),
-            isPreviewWithImageBitmap = true
-        )
+    println("Platform: ${getPlatform().name}")
+    val viewModel = PrinterViewModel()
+    val scope = rememberCoroutineScope()
+    var showPrintOptions by remember { mutableStateOf(false) }
+
+    // Load HTML content with proper error handling
+    LaunchedEffect(Unit) {
+        try {
+            isLoading = true
+            error = null
+
+            receiptHtmlContent = generateRoadLineDeliveryReceipt(
+                getDemoRoadLineDeliveryReceipt(),
+                isPreviewWithImageBitmap = false,
+                zoomLevel = getHtmlPageZoomLevel()
+            )
+
+            receiptHtmlContentWithImage = generateRoadLineDeliveryReceipt(
+                getDemoRoadLineDeliveryReceipt(),
+                isPreviewWithImageBitmap = true,
+                zoomLevel = getHtmlPageZoomLevel()
+            )
+        } catch (e: Exception) {
+            error = e.message ?: "Unknown error occurred"
+        } finally {
+            isLoading = false
+        }
     }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("KMM PDF Preview") },
+                title = { Text("Receipt Preview") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -74,49 +106,41 @@ fun PrintPreviewScreen(navController: NavHostController) {
             BottomAppBar(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
             ) {
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(
                         12.dp,
                         Alignment.CenterHorizontally
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    )
                 ) {
-                    Button(onClick = { showPreview = !showPreview }) {
+                    // Toggle Preview Button
+                    Button(
+                        onClick = { showPreview = !showPreview },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = if (showPreview) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(if (showPreview) "Hide Preview" else "Show Preview")
                     }
-                    Button(onClick = {
-                        navController.navigate(AppRoutes.PrinterScreen)
-                        // In your Composable or ViewModel where you trigger the action
-                        /*scope.launch {
-                            // 1. Get an instance of the PDF generator
-                            val pdfGenerator = getPdfGenerator()
 
-                            // 2. Get an instance of the PrinterManager we created before
-                            val printerManager = PrinterManager()
-
-                            println("🚀 Starting PDF generation...")
-                            // 3. Generate the PDF and get the data in memory
-                            val pdfData: ByteArray? = pdfGenerator.generatePdf(
-                                receipt = getDemoRoadLineDeliveryReceipt(),
-                                isPreviewWithImageBitmap = false
-                            )
-
-                            // 4. Check if generation was successful
-                            if (pdfData != null) {
-                                println("✅ PDF generated successfully, now sending to printer...")
-
-                                // 5. Pass the ByteArray to the printer
-                                val printStatus = printerManager.printPdf(pdfData)
-
-                                println("🖨️ Print job status: $printStatus")
-                                // You can show a message to the user based on the status
-
-                            } else {
-                                println("❌ PDF generation failed.")
-                            }
-                        }*/
-                    }) {
+                    // Print Button
+                    Button(
+                        onClick = { showPrintOptions = true },
+                        enabled = !isLoading && error == null,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Print,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text("Print Receipt")
                     }
                 }
@@ -131,59 +155,145 @@ fun PrintPreviewScreen(navController: NavHostController) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (showPreview) {
-                Text(
-                    text = "Showing Previews:",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                // Using FlowRow to allow previews to wrap on smaller screens if necessary
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(
-                        16.dp,
-                        Alignment.CenterHorizontally
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    // Preview 1: Text Only
-                    Card(
-                        modifier = Modifier.width(945.dp).height(630.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Column(modifier = Modifier.padding(8.dp)) {
-                            Text("Image Version", fontSize = 12.sp, color = Color.Gray)
-                            Spacer(Modifier.height(4.dp))
-                            // The background color helps confirm the composable is being laid out.
-                            HtmlView(
-                                html = receiptHtmlContentWithImage,
-                                modifier = Modifier.fillMaxSize()
-                                    .background(Color.LightGray.copy(alpha = 0.2f))
-                            )
-                        }
-                    }
-
-                    // Preview 2: With Image
-                    Card(
-                        modifier = Modifier.width(945.dp).height(630.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-                    ) {
-                        Column(modifier = Modifier.padding(8.dp)) {
-                            Text("v", fontSize = 12.sp, color = Color.Gray)
-                            Spacer(Modifier.height(4.dp))
-                            HtmlView(
-                                html = receiptHtmlContent,
-                                modifier = Modifier.fillMaxSize()
-                                    .background(Color.LightGray.copy(alpha = 0.2f))
-                            )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator()
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text("Loading receipt templates...")
                         }
                     }
                 }
-            } else {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Preview is hidden.")
+
+                error != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Error: $error",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = {
+                                    // Retry loading
+                                    scope.launch {
+                                        try {
+                                            isLoading = true
+                                            error = null
+
+                                            receiptHtmlContent = generateRoadLineDeliveryReceipt(
+                                                getDemoRoadLineDeliveryReceipt(),
+                                                isPreviewWithImageBitmap = false
+                                            )
+
+                                            receiptHtmlContentWithImage =
+                                                generateRoadLineDeliveryReceipt(
+                                                    getDemoRoadLineDeliveryReceipt(),
+                                                    isPreviewWithImageBitmap = true
+                                                )
+                                        } catch (e: Exception) {
+                                            error = e.message ?: "Unknown error occurred"
+                                        } finally {
+                                            isLoading = false
+                                        }
+                                    }
+                                }
+                            ) {
+                                Text("Retry")
+                            }
+                        }
+                    }
+                }
+
+                showPreview -> {
+                    Text(
+                        text = "Receipt Previews",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    )
+
+                    // Preview Cards in Column for better layout
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        PreviewTabs(
+                            htmlContentWithImage = {
+                                // Preview 1: With Background Image
+                                PrintPreviewCard(
+                                    title = "With Background Image",
+                                    description = "Official receipt with template background",
+                                    htmlContent = receiptHtmlContentWithImage
+                                )
+                            },
+                            htmlContentWithoutImage = {
+                                // Preview 2: Content Only
+                                PrintPreviewCard(
+                                    title = "Content Only",
+                                    description = "Clean text-only version for faster printing",
+                                    htmlContent = receiptHtmlContent
+                                )
+                            }
+                        )
+                    }
+                }
+
+                else -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Preview is hidden",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Click 'Show Preview' to view receipt templates",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
             }
         }
     }
+
+    // Print Options Bottom Sheet
+    PrintOptionsBottomSheet(
+        isVisible = showPrintOptions,
+        onDismiss = { showPrintOptions = false },
+        onConfirm = { printWithImage ->
+            showPrintOptions = false
+
+            if (getPlatform().name.contains(Constants.Platforms.PLATFORM_WEB) ||
+                getPlatform().name.contains(Constants.Platforms.PLATFORM_DESKTOP)
+            ) {
+                navController.navigate(AppRoutes.PrinterScreen(isPreviewWithImageBitmap = printWithImage))
+            } else {
+                scope.launch {
+                    viewModel.setDefaultHtmlContentForPrint(isPreviewWithImageBitmap = printWithImage)
+                }
+            }
+        }
+    )
 }

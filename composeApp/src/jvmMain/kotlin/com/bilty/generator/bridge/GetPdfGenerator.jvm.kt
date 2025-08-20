@@ -15,10 +15,11 @@ actual fun getPdfGenerator(): PdfGenerator = PdfGeneratorDesktop()
 class PdfGeneratorDesktop : PdfGenerator {
     override suspend fun generatePdf(
         receipt: RoadLineDeliveryReceipt,
-        isPreviewWithImageBitmap: Boolean
+        isPreviewWithImageBitmap: Boolean,
+        zoomLevel: Double
     ): ByteArray? = withContext(Dispatchers.IO) {
         return@withContext try {
-            val html = generateRoadLineDeliveryReceipt(receipt, isPreviewWithImageBitmap)
+            val html = generateRoadLineDeliveryReceipt(receipt, isPreviewWithImageBitmap,zoomLevel)
 
             // 1. Generate the PDF into memory first
             val outputStream = java.io.ByteArrayOutputStream()

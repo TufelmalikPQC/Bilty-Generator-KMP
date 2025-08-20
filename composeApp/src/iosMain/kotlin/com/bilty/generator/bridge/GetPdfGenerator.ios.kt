@@ -35,10 +35,11 @@ class PdfGeneratorIos : PdfGenerator {
     @OptIn(ExperimentalForeignApi::class)
     override suspend fun generatePdf(
         receipt: RoadLineDeliveryReceipt,
-        isPreviewWithImageBitmap: Boolean
+        isPreviewWithImageBitmap: Boolean,
+        zoomLevel: Double
     ): ByteArray? { // <-- Return ByteArray?
         return try {
-            val html = generateRoadLineDeliveryReceipt(receipt, isPreviewWithImageBitmap)
+            val html = generateRoadLineDeliveryReceipt(receipt, isPreviewWithImageBitmap,zoomLevel)
             // ... (keep the existing printFormatter and renderer setup) ...
 
             val pdfData = NSMutableData() // You already have this

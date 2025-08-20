@@ -24,10 +24,11 @@ class PdfGeneratorWeb : PdfGenerator {
     // STEP 2: The function must now return a nullable ByteArray?
     override suspend fun generatePdf(
         receipt: RoadLineDeliveryReceipt,
-        isPreviewWithImageBitmap: Boolean
+        isPreviewWithImageBitmap: Boolean,
+        zoomLevel: Double
     ): ByteArray? {
         return try {
-            val html = generateRoadLineDeliveryReceipt(receipt, isPreviewWithImageBitmap)
+            val html = generateRoadLineDeliveryReceipt(receipt, isPreviewWithImageBitmap,zoomLevel)
             val div = document.createElement("div") as org.w3c.dom.HTMLDivElement
             div.innerHTML = html
             document.body?.appendChild(div)

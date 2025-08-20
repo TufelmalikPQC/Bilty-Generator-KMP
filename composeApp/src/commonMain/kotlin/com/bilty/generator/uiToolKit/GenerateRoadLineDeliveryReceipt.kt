@@ -1,34 +1,31 @@
 package com.bilty.generator.uiToolKit
 
-import com.bilty.generator.bridge.getImageAsBase64
-import com.bilty.generator.getPlatform
+import com.bilty.generator.model.constants.Constants.RECEIPT_IMAGE_PATH
 import com.bilty.generator.model.data.BiltyChargesTable
 import com.bilty.generator.model.data.RoadLineDeliveryReceipt
 
-fun generateRoadLineDeliveryReceipt(
+suspend fun generateRoadLineDeliveryReceipt(
     receipt: RoadLineDeliveryReceipt,
-    isPreviewWithImageBitmap: Boolean
+    isPreviewWithImageBitmap: Boolean,
+    zoomLevel: Double = getHtmlPageZoomLevel()
 ): String {
 
-    var imagePath = "images/transport_roadline_invoice.jpeg"
-    if (getPlatform().name.contains("Android")) {
-        imagePath = "transport_roadline_invoice.jpeg"
-    }
-    val receiptImageBase64 = getImageAsBase64(imagePath)
-    val zoomLevel = 0.80
 
-    val backgroundImage = if (isPreviewWithImageBitmap) {
+    val receiptImageBase64 = getImageAsBase64Code(RECEIPT_IMAGE_PATH)
+
+    val backgroundImage = if (isPreviewWithImageBitmap && receiptImageBase64.isNotEmpty()) {
         "background-image: url('data:image/jpeg;base64,$receiptImageBase64');"
     } else {
-        "background-color: #f0f0f0; border: 2px dashed red;"
+        "background-color: transparent;"
     }
+
 
     return """
         <!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8"/>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
             <title>Lunia Roadlines - Delivery Receipt</title>
             <style>
                 * {

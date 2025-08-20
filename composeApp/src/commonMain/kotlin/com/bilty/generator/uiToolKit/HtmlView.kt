@@ -6,17 +6,17 @@ import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewStateWithHTMLData
 
 /**
- * A common WebView composable that displays HTML content.
- * This works across Android, iOS, Desktop (JVM), and Web (Wasm)
- * thanks to the compose-webview-multiplatform library.
+ * A common WebView composable that displays HTML content and is zoomable.
+ * This works across Android, iOS, Desktop (JVM), and Web (Wasm).
  */
 @Composable
 fun HtmlView(html: String, modifier: Modifier = Modifier) {
-    // The library provides a state holder that can load HTML data directly.
-    // It automatically handles updates when the `html` string changes.
     val webViewState = rememberWebViewStateWithHTMLData(data = html)
 
-    // Use the WebView composable from the library.
+    webViewState.webSettings.apply {
+        supportZoom = true
+    }
+
     WebView(
         state = webViewState,
         modifier = modifier

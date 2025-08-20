@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +20,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,23 +35,29 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.bilty.generator.model.data.PrinterInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrinterScreen(navController: NavHostController) {
+fun PrinterScreen(navController: NavHostController, isPreviewWithImageBitmap: Boolean) {
+    println("isPreviewWithImageBitmap => $isPreviewWithImageBitmap")
     val viewModel = PrinterViewModel()
     val uiState by viewModel.uiState.collectAsState()
+    var isPrintDotMatrixFormat by remember { mutableStateOf(true) }
+
 
     // This is where you would get your actual PDF data from your PdfGenerator
     // For this example, we'll use a placeholder.
     // val dummyPdfData: ByteArray = "This is a test PDF".encodeToByteArray()
+
     val defaultPdfByteArray by viewModel.defaultPdfData.collectAsState()
 
 
@@ -68,17 +77,17 @@ fun PrinterScreen(navController: NavHostController) {
             BottomAppBar(
                 modifier = Modifier.height(80.dp)
             ) {
-                Row(
+                FlowRow(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    itemVerticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(
                         onClick = { viewModel.onPrintClicked(pdfData = defaultPdfByteArray) },
                         // Button is enabled only when a printer is selected or if the list is empty
                         // (for platforms like Android where the system dialog handles selection)
                         enabled = uiState.selectedPrinterName != null || uiState.printers.isEmpty(),
-                        modifier = Modifier.fillMaxWidth().height(50.dp)
+                        modifier = Modifier.height(50.dp)
                     ) {
                         Icon(Icons.Default.Print, contentDescription = "Print Icon")
                         Spacer(Modifier.width(8.dp))
@@ -97,33 +106,41 @@ fun PrinterScreen(navController: NavHostController) {
             } else if (uiState.printers.isEmpty()) {
                 EmptyPrinterListView()
             } else {
-                PrinterList(
-                    printers = uiState.printers,
-                    selectedPrinterName = uiState.selectedPrinterName,
-                    onPrinterSelected = viewModel::onPrinterSelected
-                )
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp)
+                ) {
+                    items(uiState.printers) { printer ->
+                        PrinterRow(
+                            printerName = printer.name,
+                            isSelected = printer.name == uiState.selectedPrinterName,
+                            onSelected = { viewModel.onPrinterSelected(printer.name) }
+                        )
+                        HorizontalDivider(
+                            Modifier,
+                            DividerDefaults.Thickness,
+                            DividerDefaults.color
+                        )
+                    }
+                    item {
+                        FlowRow(
+                            itemVerticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            Text(
+                                text = "Print Dot Matrix Format"
+                            )
+                            Spacer(Modifier.width(2.dp))
+                            Checkbox(
+                                colors = CheckboxDefaults.colors(),
+                                checked = isPrintDotMatrixFormat,
+                                onCheckedChange = { isPrintDotMatrixFormat = it },
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+                        }
+                    }
+                }
             }
-        }
-    }
-}
-
-@Composable
-private fun PrinterList(
-    printers: List<PrinterInfo>,
-    selectedPrinterName: String?,
-    onPrinterSelected: (String) -> Unit
-) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp)
-    ) {
-        items(printers) { printer ->
-            PrinterRow(
-                printerName = printer.name,
-                isSelected = printer.name == selectedPrinterName,
-                onSelected = { onPrinterSelected(printer.name) }
-            )
-            HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
         }
     }
 }

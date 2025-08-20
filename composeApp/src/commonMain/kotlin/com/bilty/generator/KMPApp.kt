@@ -24,25 +24,16 @@ fun KMPApp() {
                 PrintPreviewScreen(navController)
             }
 
-            composable<AppRoutes.PrinterScreen> {
-                PrinterScreen(navController)
+            composable<AppRoutes.PrinterScreen> { route ->
+                route.savedStateHandle.get<Boolean>("isPreviewWithImageBitmap")
+                    ?.let {
+                        PrinterScreen(
+                            navController = navController,
+                            isPreviewWithImageBitmap = it
+                        )
+                    }
             }
         }
     }
 
 }
-/*
-                    scope.launch {
-                        val pdfGenerator = getPdfGenerator()
-                        val pdfSuccess = pdfGenerator.generatePdf(
-                            receipt = getDemoRoadLineDeliveryReceipt(),
-                        )
-                        if (pdfSuccess) {
-                            println("PDF generated successfully")
-                        } else {
-                            println("PDF generation failed")
-                        }
-                    }
-
-
-* */

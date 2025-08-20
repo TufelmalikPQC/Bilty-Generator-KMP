@@ -3,7 +3,7 @@ package com.bilty.generator.modules.print
 
 import com.bilty.generator.bridge.PrinterManager
 import com.bilty.generator.bridge.getPdfGenerator
-import com.bilty.generator.model.data.PrinterInfo
+import com.bilty.generator.model.data.PrinterScreenUiState
 import com.bilty.generator.uiToolKit.getDemoRoadLineDeliveryReceipt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,11 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class PrinterScreenUiState(
-    val isLoading: Boolean = true,
-    val printers: List<PrinterInfo> = emptyList(),
-    val selectedPrinterName: String? = null
-)
 
 class PrinterViewModel {
     // This is the PrinterManager we've been building
@@ -77,6 +72,31 @@ class PrinterViewModel {
                     // Pre-select the default printer if one exists
                     selectedPrinterName = defaultPrinter?.name
                 )
+            }
+        }
+    }
+
+
+    suspend fun setDefaultHtmlContentForPrint(isPreviewWithImageBitmap: Boolean) {
+        viewModelScope.launch {
+            try {
+                val pdfData = getPdfGenerator().generatePdf(
+                    receipt = getDemoRoadLineDeliveryReceipt(),
+                    isPreviewWithImageBitmap = isPreviewWithImageBitmap
+                )
+
+                if (pdfData != null && pdfData.isNotEmpty()) {
+                    println("📄 PDF generated successfully: ${pdfData.size} bytes")
+                    defaultPdfData.emit(pdfData)
+                    // Trigger printing
+                    onPrintClicked(pdfData)
+                } else {
+                    println("❌ Failed to generate PDF")
+                    // Handle error - maybe show a toast or error message
+                }
+            } catch (e: Exception) {
+                println("❌ Error in setDefaultHtmlContentForPrint: ${e.message}")
+                e.printStackTrace()
             }
         }
     }
