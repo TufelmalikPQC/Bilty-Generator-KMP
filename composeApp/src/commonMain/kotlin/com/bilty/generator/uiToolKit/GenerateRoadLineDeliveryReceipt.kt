@@ -25,7 +25,7 @@ suspend fun generateRoadLineDeliveryReceipt(
         <html lang="en">
         <head>
             <meta charset="UTF-8"/>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
             <title>Lunia Roadlines - Delivery Receipt</title>
             <style>
                 * {
@@ -41,9 +41,7 @@ suspend fun generateRoadLineDeliveryReceipt(
                     margin: 0;
                     padding: 0;
                     font-family: Arial, sans-serif;
-                    zoom: $zoomLevel;
-                    transform: scale($zoomLevel)
-                    overflow: hidden; /* Prevents scrollbars and content spillover */
+                    overflow: auto;
                 }
 
                 /* This rule tells the browser to print the page in landscape mode and removes margins. */
@@ -62,6 +60,7 @@ suspend fun generateRoadLineDeliveryReceipt(
                     background-size: 100% 100%; /* Stretch image to fit container */
                     background-repeat: no-repeat;
                     background-position: center;
+                    transform: scale($zoomLevel);
                     page-break-inside: avoid; /* Prevents the element from being split across pages */
                 }
 
@@ -132,7 +131,6 @@ suspend fun generateRoadLineDeliveryReceipt(
         </html>
     """.trimIndent()
 }
-
 
 fun getDemoRoadLineDeliveryReceipt(): RoadLineDeliveryReceipt {
     return RoadLineDeliveryReceipt(

@@ -3,10 +3,8 @@ package com.bilty.generator.modules.print
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,8 +25,6 @@ import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -40,10 +36,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.bilty.generator.modules.print.components.EmptyPrinterListView
+import com.bilty.generator.modules.print.components.PrinterRow
+import com.bilty.generator.uiToolKit.PrintingStatusBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,11 +49,6 @@ fun PrinterScreen(navController: NavHostController, isPreviewWithImageBitmap: Bo
     val viewModel = PrinterViewModel()
     val uiState by viewModel.uiState.collectAsState()
     var isPrintDotMatrixFormat by remember { mutableStateOf(true) }
-
-
-    // This is where you would get your actual PDF data from your PdfGenerator
-    // For this example, we'll use a placeholder.
-    // val dummyPdfData: ByteArray = "This is a test PDF".encodeToByteArray()
 
     val defaultPdfByteArray by viewModel.defaultPdfData.collectAsState()
 
@@ -87,7 +79,7 @@ fun PrinterScreen(navController: NavHostController, isPreviewWithImageBitmap: Bo
                         // Button is enabled only when a printer is selected or if the list is empty
                         // (for platforms like Android where the system dialog handles selection)
                         enabled = uiState.selectedPrinterName != null || uiState.printers.isEmpty(),
-                        modifier = Modifier.height(50.dp)
+                        modifier = Modifier.fillMaxWidth().height(50.dp)
                     ) {
                         Icon(Icons.Default.Print, contentDescription = "Print Icon")
                         Spacer(Modifier.width(8.dp))
@@ -142,48 +134,15 @@ fun PrinterScreen(navController: NavHostController, isPreviewWithImageBitmap: Bo
                 }
             }
         }
-    }
-}
 
-@Composable
-private fun PrinterRow(
-    printerName: String,
-    isSelected: Boolean,
-    onSelected: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onSelected)
-            .padding(vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(
-            selected = isSelected,
-            onClick = onSelected
-        )
-        Spacer(Modifier.width(16.dp))
-        Text(text = printerName, style = MaterialTheme.typography.bodyLarge)
-    }
-}
-
-@Composable
-private fun EmptyPrinterListView() {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "No Printers Found",
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(Modifier.height(8.dp))
-        Text(
-            text = "On this platform, the printer list is shown in the system's print dialog after you click 'Print'.",
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodySmall
+        // Printing bottom sheet (modal, blocks until done)
+        PrintingStatusBottomSheet(
+            isVisible = uiState.isPrinting || uiState.lastPrintStatus != null,
+            progressPercent = uiState.printProgress,
+            statusText = uiState.printStatusMessage,
+            isCompleted = uiState.lastPrintStatus != null,
+            onDismissBlocked = { /* block dismiss */ },
+            onCloseAfterComplete = { viewModel.resetPrintStatus() }
         )
     }
 }

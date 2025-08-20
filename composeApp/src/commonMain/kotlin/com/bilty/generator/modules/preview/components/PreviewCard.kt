@@ -1,4 +1,4 @@
-package com.bilty.generator.modules.preview.componetnts
+package com.bilty.generator.modules.preview.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background

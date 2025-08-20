@@ -44,7 +44,7 @@ import androidx.navigation.NavHostController
 import com.bilty.generator.getPlatform
 import com.bilty.generator.model.constants.Constants
 import com.bilty.generator.modules.AppRoutes
-import com.bilty.generator.modules.preview.componetnts.PrintPreviewCard
+import com.bilty.generator.modules.preview.components.PrintPreviewCard
 import com.bilty.generator.modules.print.PrinterViewModel
 import com.bilty.generator.uiToolKit.PreviewTabs
 import com.bilty.generator.uiToolKit.PrintOptionsBottomSheet
