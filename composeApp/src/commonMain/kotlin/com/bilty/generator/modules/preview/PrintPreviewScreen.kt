@@ -67,6 +67,9 @@ fun PrintPreviewScreen(navController: NavHostController) {
     val scope = rememberCoroutineScope()
     var showPrintOptions by remember { mutableStateOf(false) }
 
+    LaunchedEffect(showPrintOptions) {
+        showPreview = !showPrintOptions
+    }
     // Load HTML content with proper error handling
     LaunchedEffect(Unit) {
         try {
@@ -131,7 +134,10 @@ fun PrintPreviewScreen(navController: NavHostController) {
 
                     // Print Button
                     Button(
-                        onClick = { showPrintOptions = true },
+                        onClick = {
+                            showPrintOptions = true
+                            showPreview = false
+                        },
                         enabled = !isLoading && error == null,
                         modifier = Modifier.weight(1f)
                     ) {

@@ -18,6 +18,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,18 +39,21 @@ fun PrintOptionsBottomSheet(
 ) {
     var selectedOption by remember { mutableStateOf<PrintOption?>(null) }
 
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
     if (isVisible) {
         ModalBottomSheet(
             onDismissRequest = {
                 onDismiss()
                 selectedOption = null
             },
+            sheetState = sheetState,
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp)
+                    .padding(horizontal = 24.dp, vertical = 16.dp)
                     .navigationBarsPadding(),
                 horizontalAlignment = Alignment.Start
             ) {
@@ -74,7 +78,7 @@ fun PrintOptionsBottomSheet(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { selectedOption = option }
-                            .padding(vertical = 12.dp),
+                            .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
@@ -102,7 +106,7 @@ fun PrintOptionsBottomSheet(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // Buttons
                 Row(

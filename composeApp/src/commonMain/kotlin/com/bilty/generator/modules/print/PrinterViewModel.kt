@@ -5,6 +5,7 @@ import com.bilty.generator.bridge.PrinterManager
 import com.bilty.generator.bridge.getPdfGenerator
 import com.bilty.generator.model.data.PrinterScreenUiState
 import com.bilty.generator.uiToolKit.getDemoRoadLineDeliveryReceipt
+import com.bilty.generator.uiToolKit.getHtmlPageZoomLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +37,8 @@ class PrinterViewModel {
             defaultPdfData.emit(
                 getPdfGenerator().generatePdf(
                     receipt = getDemoRoadLineDeliveryReceipt(),
-                    isPreviewWithImageBitmap = false
+                    isPreviewWithImageBitmap = false,
+                    zoomLevel = getHtmlPageZoomLevel()
                 ) ?: ByteArray(0)
             )
         }
@@ -82,7 +84,8 @@ class PrinterViewModel {
             try {
                 val pdfData = getPdfGenerator().generatePdf(
                     receipt = getDemoRoadLineDeliveryReceipt(),
-                    isPreviewWithImageBitmap = isPreviewWithImageBitmap
+                    isPreviewWithImageBitmap = isPreviewWithImageBitmap,
+                    zoomLevel = getHtmlPageZoomLevel()
                 )
 
                 if (pdfData != null && pdfData.isNotEmpty()) {
