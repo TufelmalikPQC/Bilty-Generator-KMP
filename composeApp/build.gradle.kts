@@ -93,6 +93,7 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
         }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -101,7 +102,7 @@ kotlin {
             implementation(libs.openhtmltopdf.pdfbox)
 
             // print pdf
-            implementation(libs.pdfbox)
+            //implementation(libs.pdfbox)
         }
     }
 }
@@ -125,6 +126,7 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -142,9 +144,18 @@ compose.desktop {
         mainClass = "com.bilty.generator.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            /*
+              * Windows: .exe (executable), .msi (installer)
+              * Linux: .deb (Debian package)
+              * macOS: .dmg (Disk Image)
+             */
+            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.bilty.generator"
             packageVersion = "1.0.0"
+
+            // Optional: You can add more metadata
+            description = "Bilty Generator Application"
+            copyright = "© 2025 Your Company. All rights reserved."
         }
 
         // Required JVM arguments for KCEF
@@ -155,12 +166,6 @@ compose.desktop {
         if (System.getProperty("os.name").contains("Mac")) {
             jvmArgs("--add-opens", "java.desktop/sun.lwawt=ALL-UNNAMED")
             jvmArgs("--add-opens", "java.desktop/sun.lwawt.macosx=ALL-UNNAMED")
-        }
-
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "BiltyGenerator"
-            packageVersion = "1.0.0"
         }
 
         // ProGuard configuration for release builds
