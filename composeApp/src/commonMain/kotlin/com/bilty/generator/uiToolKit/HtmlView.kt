@@ -13,10 +13,6 @@ import com.multiplatform.webview.web.rememberWebViewStateWithHTMLData
 fun HtmlView(html: String, modifier: Modifier = Modifier) {
     val webViewState = rememberWebViewStateWithHTMLData(data = html)
 
-    webViewState.webSettings.apply {
-        supportZoom = true
-    }
-
     WebView(
         state = webViewState,
         modifier = modifier

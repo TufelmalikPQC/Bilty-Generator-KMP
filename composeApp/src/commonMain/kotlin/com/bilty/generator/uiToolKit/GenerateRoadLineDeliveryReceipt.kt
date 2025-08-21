@@ -7,8 +7,10 @@ import com.bilty.generator.model.data.RoadLineDeliveryReceipt
 suspend fun generateRoadLineDeliveryReceipt(
     receipt: RoadLineDeliveryReceipt,
     isPreviewWithImageBitmap: Boolean,
+    isForPreview: Boolean,
     zoomLevel: Double = getHtmlPageZoomLevel()
 ): String {
+    println("isForPreview-> $isForPreview")
 
 
     val receiptImageBase64 = getImageAsBase64Code(RECEIPT_IMAGE_PATH)
@@ -19,13 +21,38 @@ suspend fun generateRoadLineDeliveryReceipt(
         "background-color: transparent;"
     }
 
+    if(isForPreview){
+      """
+          html, body {
+                    width: 100%;
+                    height: 100%;
+                    margin: 0;
+                    padding: 0;
+                    font-family: Arial, sans-serif;
+                    zoom: $zoomLevel;
+                    transform: scale($zoomLevel);
+                    overflow: auto;
+                }
+      """.trimIndent()
+    }else{
+        """
+            html, body {
+                    width: 100%;
+                    height: 100%;
+                    margin: 0;
+                    padding: 0;
+                    font-family: Arial, sans-serif;
+                    overflow: auto;
+                }
+        """.trimIndent()
+    }
 
     return """
         <!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8"/>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
             <title>Lunia Roadlines - Delivery Receipt</title>
             <style>
                 * {
@@ -34,17 +61,16 @@ suspend fun generateRoadLineDeliveryReceipt(
                     box-sizing: border-box;
                 }
 
-                /* Ensure the body fills the page and has no default margin or overflow */
-                html, body {
+                 html, body {
                     width: 100%;
                     height: 100%;
                     margin: 0;
                     padding: 0;
+                    ${if (isForPreview) "zoom: $zoomLevel; transform: scale($zoomLevel);" else ""}
                     font-family: Arial, sans-serif;
                     overflow: auto;
                 }
 
-                /* This rule tells the browser to print the page in landscape mode and removes margins. */
                 @page {
                     size: landscape;
                     margin: 0;
@@ -52,16 +78,14 @@ suspend fun generateRoadLineDeliveryReceipt(
 
                 .form-container {
                     position: relative;
-                    /* Dimensions adjusted to better match the provided receipt's aspect ratio */
-                    width: 1191px;
-                    height: 820px; /* Reduced height further to ensure bottom is not cut off */
+                    width: 100%;
+                    height: 100%;
                     margin: 0 auto;
                     $backgroundImage
-                    background-size: 100% 100%; /* Stretch image to fit container */
+                    background-size: 100% 100%;
                     background-repeat: no-repeat;
                     background-position: center;
-                    transform: scale($zoomLevel);
-                    page-break-inside: avoid; /* Prevents the element from being split across pages */
+                    page-break-inside: avoid;
                 }
 
                 .form-field {
@@ -77,57 +101,39 @@ suspend fun generateRoadLineDeliveryReceipt(
                     font-family: Arial, sans-serif;
                 }
 
-                /* Specific styles for printing */
                 @media print {
                     body {
-                        /* Ensures the background graphics (like your receipt image) are printed */
-                        -webkit-print-color-adjust: exact; /* For Chrome, Safari, Edge */
-                        print-color-adjust: exact; /* For Firefox */
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
                     }
                 }
             </style>
         </head>
-            <body>
-                <div class="form-container">
-                    <div class="form-field" style="left: 155px; top: 153px;">${receipt.receiptNumber}</div>
-                    <div class="form-field" style="left: 435px; top: 153px;">${receipt.branchName}</div>
-                    <div class="form-field" style="left: 830px; top: 149px;">${receipt.date}</div>
+        <body>
+            <div class="form-container">
+                <div class="form-field" style="left: 13.01%; top: 18.66%;">${receipt.receiptNumber}</div>
+                <div class="form-field" style="left: 36.53%; top: 18.66%;">${receipt.branchName}</div>
+                <div class="form-field" style="left: 69.70%; top: 18.17%;">${receipt.date}</div>
 
-                    <div class="form-field" style="left: 245px; top: 218px;">${receipt.consignee}</div>
-                    <div class="form-field" style="left: 245px; top: 287px;">${receipt.consignor}</div>
-                    <div class="form-field" style="left: 245px; top: 355px;">${receipt.biltyNumber}</div>
-                    <div class="form-field" style="left: 245px; top: 423px;">${receipt.biltyDate}</div>
-                    <div class="form-field" style="left: 245px; top: 490px;">${receipt.fromLocation}</div>
-                    <div class="form-field" style="left: 245px; top: 560px;">${receipt.packageCount}</div>
-                    <div class="form-field" style="left: 245px; top: 625px;">${receipt.particulars}</div>
-                    <div class="form-field" style="left: 245px; top: 693px;">${receipt.pMarka}</div>
+                <div class="form-field" style="left: 20.57%; top: 26.59%;">${receipt.consignee}</div>
+                <div class="form-field" style="left: 20.57%; top: 35.00%;">${receipt.consignor}</div>
+                <div class="form-field" style="left: 20.57%; top: 43.29%;">${receipt.biltyNumber}</div>
+                <div class="form-field" style="left: 20.57%; top: 51.59%;">${receipt.biltyDate}</div>
+                <div class="form-field" style="left: 20.57%; top: 59.76%;">${receipt.fromLocation}</div>
+                <div class="form-field" style="left: 20.57%; top: 68.29%;">${receipt.packageCount}</div>
+                <div class="form-field" style="left: 20.57%; top: 76.22%;">${receipt.particulars}</div>
+                <div class="form-field" style="left: 20.57%; top: 84.51%;">${receipt.pMarka}</div>
 
-                    <div class="form-field" style="left: 920px; top: 213px; width: 140px; text-align: right;">${
-        receipt.biltyChargesTable.freight
-    }</div>
-                    <div class="form-field" style="left: 920px; top: 285px; width: 140px; text-align: right;">${
-        receipt.biltyChargesTable.charity
-    }</div>
-                    <div class="form-field" style="left: 920px; top: 355px; width: 140px; text-align: right;">${
-        receipt.biltyChargesTable.handling
-    }</div>
-                    <div class="form-field" style="left: 920px; top: 421px; width: 140px; text-align: right;">${
-        receipt.biltyChargesTable.delivery
-    }</div>
-                    <div class="form-field" style="left: 920px; top: 490px; width: 140px; text-align: right;">${
-        receipt.biltyChargesTable.ddCharges
-    }</div>
-                    <div class="form-field" style="left: 920px; top: 558px; width: 140px; text-align: right;">${
-        receipt.biltyChargesTable.demurrage
-    }</div>
-                    <div class="form-field" style="left: 920px; top: 623px; width: 140px; text-align: right;">${
-        receipt.biltyChargesTable.otherCharges
-    }</div>
-                    <div class="form-field" style="left: 920px; top: 664px; width: 140px; text-align: right; font-weight: bold; font-size: 26px;">${
-        receipt.biltyChargesTable.grandTotal
-    }</div>
-                </div>
-            </body>
+                <div class="form-field" style="left: 77.27%; top: 25.98%; width: 140px; text-align: right;">${receipt.biltyChargesTable.freight}</div>
+                <div class="form-field" style="left: 77.27%; top: 34.76%; width: 140px; text-align: right;">${receipt.biltyChargesTable.charity}</div>
+                <div class="form-field" style="left: 77.27%; top: 43.29%; width: 140px; text-align: right;">${receipt.biltyChargesTable.handling}</div>
+                <div class="form-field" style="left: 77.27%; top: 51.34%; width: 140px; text-align: right;">${receipt.biltyChargesTable.delivery}</div>
+                <div class="form-field" style="left: 77.27%; top: 59.76%; width: 140px; text-align: right;">${receipt.biltyChargesTable.ddCharges}</div>
+                <div class="form-field" style="left: 77.27%; top: 68.05%; width: 140px; text-align: right;">${receipt.biltyChargesTable.demurrage}</div>
+                <div class="form-field" style="left: 77.27%; top: 75.98%; width: 140px; text-align: right;">${receipt.biltyChargesTable.otherCharges}</div>
+                <div class="form-field" style="left: 77.27%; top: 80.98%; width: 140px; text-align: right; font-weight: bold; font-size: 1.625em;">${receipt.biltyChargesTable.grandTotal}</div>
+            </div>
+        </body>
         </html>
     """.trimIndent()
 }

@@ -12,7 +12,7 @@ data class PrinterScreenUiState(
     val isPrintDotMatrixFormat: Boolean = false,
 
     // Printing status UI
-    val isPrinting: Boolean = false,
+    var isPrinting: Boolean = false,
     val printProgress: Int = 0, // 0..100
     val printStatusMessage: String = "",
     val lastPrintStatus: PrintStatus? = null

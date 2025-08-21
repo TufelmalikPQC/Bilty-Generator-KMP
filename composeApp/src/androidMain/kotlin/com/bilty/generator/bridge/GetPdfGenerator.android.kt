@@ -1,7 +1,8 @@
-
 package com.bilty.generator.bridge
 
 import android.annotation.SuppressLint
+import android.os.Environment
+import com.bilty.generator.model.constants.PDF
 import com.bilty.generator.model.data.RoadLineDeliveryReceipt
 import com.bilty.generator.model.interfaces.PdfGenerator
 import com.bilty.generator.uiToolKit.generateRoadLineDeliveryReceipt
@@ -11,6 +12,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileOutputStream
 
 actual fun getPdfGenerator(): PdfGenerator = PdfGeneratorAndroid()
 
@@ -19,63 +21,78 @@ class PdfGeneratorAndroid : PdfGenerator {
     override suspend fun generatePdf(
         receipt: RoadLineDeliveryReceipt,
         isPreviewWithImageBitmap: Boolean,
+        isWantToSavePDFLocally: Boolean,
         zoomLevel: Double
     ): ByteArray? = withContext(Dispatchers.Main) {
         try {
-            val html = generateRoadLineDeliveryReceipt(receipt, isPreviewWithImageBitmap,zoomLevel)
+            val html = generateRoadLineDeliveryReceipt(
+                receipt,
+                isPreviewWithImageBitmap,
+                false,
+                zoomLevel
+            )
             val result = CompletableDeferred<ByteArray?>()
             val context = androidContextActivity ?: return@withContext null
 
-            // Ensure cache directory exists
+            // Ensure cache directory exists for the temporary file
             if (!context.cacheDir.exists()) {
                 context.cacheDir.mkdirs()
             }
 
-            // Create unique filename to avoid conflicts
+            // Create a unique temporary filename to avoid conflicts
             val timestamp = System.currentTimeMillis()
-            val file = File(context.cacheDir, "temp_receipt_$timestamp.pdf")
+            val tempFile = File(context.cacheDir, "temp_receipt_$timestamp.pdf")
 
-            println("📄 Generating PDF at: ${file.absolutePath}")
+            println("📄 Generating temporary PDF at: ${tempFile.absolutePath}")
 
             HtmlToPdfConvertor(context).apply {
                 setJavaScriptEnabled(true)
                 convert(
-                    pdfLocation = file,
+                    pdfLocation = tempFile,
                     htmlString = html,
                     onPdfGenerationFailed = { error ->
                         println("❌ PDF generation failed: $error")
-                        // Clean up file if it exists
-                        if (file.exists()) {
-                            file.delete()
+                        if (tempFile.exists()) {
+                            tempFile.delete()
                         }
                         result.complete(null)
                     },
                     onPdfGenerated = { pdfFile ->
                         try {
                             println("✅ PDF generated successfully: ${pdfFile.absolutePath}")
-                            println("📊 File exists: ${pdfFile.exists()}, Size: ${pdfFile.length()} bytes")
-
                             if (!pdfFile.exists() || pdfFile.length() == 0L) {
                                 println("❌ PDF file is empty or doesn't exist")
                                 result.complete(null)
                                 return@convert
                             }
 
-                            // Read the file's bytes
+                            // 1. Read the file's bytes into memory
                             val pdfData = pdfFile.readBytes()
                             println("📦 Read ${pdfData.size} bytes from PDF")
 
-                            // Clean up the temporary file
+                            // 2. If requested, save the data to a permanent public file
+                            if (isWantToSavePDFLocally) {
+                                val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                                val outputPath = File(downloadsDir, PDF.pdfSavePath(receipt.receiptNumber))
+
+                                // Ensure parent directories exist
+                                outputPath.parentFile?.mkdirs()
+
+                                FileOutputStream(outputPath).use { fileStream ->
+                                    fileStream.write(pdfData)
+                                }
+                                println("✅ PDF saved to: ${outputPath.absolutePath}")
+                            }
+
+                            // 3. Clean up the temporary file
                             val deleted = pdfFile.delete()
                             println("🗑️ Temp file deleted: $deleted")
 
-                            // Complete with the ByteArray data
+                            // 4. Complete with the ByteArray data for in-app use
                             result.complete(pdfData)
                         } catch (e: Exception) {
-                            println("❌ Error reading PDF file: ${e.message}")
+                            println("❌ Error processing generated PDF: ${e.message}")
                             e.printStackTrace()
-
-                            // Clean up file if it exists
                             if (pdfFile.exists()) {
                                 pdfFile.delete()
                             }
@@ -87,7 +104,7 @@ class PdfGeneratorAndroid : PdfGenerator {
 
             return@withContext result.await()
         } catch (e: Exception) {
-            println("❌ PDF generation error: ${e.message}")
+            println("❌ Top-level PDF generation error: ${e.message}")
             e.printStackTrace()
             return@withContext null
         }

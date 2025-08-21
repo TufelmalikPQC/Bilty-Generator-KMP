@@ -4,23 +4,12 @@ import com.bilty.generator.uiToolKit.generateRoadLineDeliveryReceipt
 import com.bilty.generator.model.data.RoadLineDeliveryReceipt
 import com.bilty.generator.model.interfaces.PdfGenerator
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.useContents
-import platform.CoreGraphics.CGRectMake
-import platform.Foundation.NSDocumentDirectory
-import platform.Foundation.NSFileManager
+import kotlinx.cinterop.refTo
+import platform.Foundation.NSData
 import platform.Foundation.NSMutableData
-import platform.Foundation.NSSearchPathForDirectoriesInDomains
-import platform.Foundation.NSUserDomainMask
-import platform.Foundation.NSValue
-import platform.Foundation.setValue
-import platform.Foundation.writeToFile
+import platform.Foundation.getBytes
 import platform.UIKit.UIGraphicsBeginPDFContextToData
-import platform.UIKit.UIGraphicsBeginPDFPage
 import platform.UIKit.UIGraphicsEndPDFContext
-import platform.UIKit.UIGraphicsGetPDFContextBounds
-import platform.UIKit.UIMarkupTextPrintFormatter
-import platform.UIKit.UIPrintPageRenderer
-import platform.UIKit.valueWithCGRect
 
 
 actual fun getPdfGenerator(): PdfGenerator = PdfGeneratorIos()
@@ -36,10 +25,16 @@ class PdfGeneratorIos : PdfGenerator {
     override suspend fun generatePdf(
         receipt: RoadLineDeliveryReceipt,
         isPreviewWithImageBitmap: Boolean,
+        isWantToSavePDFLocally: Boolean,
         zoomLevel: Double
     ): ByteArray? { // <-- Return ByteArray?
         return try {
-            val html = generateRoadLineDeliveryReceipt(receipt, isPreviewWithImageBitmap,zoomLevel)
+            val html = generateRoadLineDeliveryReceipt(
+                receipt,
+                isPreviewWithImageBitmap,
+                false,
+                zoomLevel
+            )
             // ... (keep the existing printFormatter and renderer setup) ...
 
             val pdfData = NSMutableData() // You already have this

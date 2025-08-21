@@ -10,6 +10,7 @@ interface PdfGenerator {
     suspend fun generatePdf(
         receipt: RoadLineDeliveryReceipt,
         isPreviewWithImageBitmap: Boolean,
+        isWantToSavePDFLocally: Boolean,
         zoomLevel: Double
     ): ByteArray?
 }

@@ -5,5 +5,6 @@ enum class PrintStatus {
     CANCELLED,
     FAILED,
     PENDING,
-    NOT_SUPPORTED
+    NOT_SUPPORTED,
+    NOT_STARTED,
 }

@@ -26,7 +26,12 @@ actual class PrinterManager {
         val printManager = androidContextActivity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager
             ?: return PrintStatus.FAILED
 
-        val jobName = "Your_App_Document"
+        val jobName = "Receipt_Document"
+        val printAttributes = PrintAttributes.Builder()
+            .setMediaSize(PrintAttributes.MediaSize.UNKNOWN_LANDSCAPE) // or your target size
+            .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+            .build()
+
         printManager.print(jobName, object : PrintDocumentAdapter() {
             override fun onWrite(
                 pages: Array<out PageRange>?,
@@ -61,7 +66,7 @@ actual class PrinterManager {
                     .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).build()
                 callback.onLayoutFinished(info, true)
             }
-        }, null)
+        }, printAttributes)
 
         // The job is handed off to the system. We can only assume it's pending.
         return PrintStatus.PENDING

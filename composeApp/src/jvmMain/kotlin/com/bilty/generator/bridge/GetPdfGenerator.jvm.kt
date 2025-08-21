@@ -16,31 +16,43 @@ class PdfGeneratorDesktop : PdfGenerator {
     override suspend fun generatePdf(
         receipt: RoadLineDeliveryReceipt,
         isPreviewWithImageBitmap: Boolean,
+        isWantToSavePDFLocally: Boolean,
         zoomLevel: Double
     ): ByteArray? = withContext(Dispatchers.IO) {
         return@withContext try {
-            val html = generateRoadLineDeliveryReceipt(receipt, isPreviewWithImageBitmap,zoomLevel)
-
+            println("Content Data : ${receipt.receiptNumber}")
+            val html = generateRoadLineDeliveryReceipt(
+                receipt,
+                isPreviewWithImageBitmap,
+                false,
+                zoomLevel
+            )
+            println("Content Html Is Not Empty : ${html.isNotEmpty()}")
             // 1. Generate the PDF into memory first
             val outputStream = java.io.ByteArrayOutputStream()
+
             PdfRendererBuilder().run {
                 withHtmlContent(html, null)
                 toStream(outputStream)
-                run()
+                run() // This is crucial - actually builds the PDF
             }
             val pdfData = outputStream.toByteArray()
+            
+            println("📄 PDF generation completed: ${pdfData.size} bytes")
 
-            // 2. Now, save the generated data to a file
-            val outputPath =
-                System.getProperty("user.home") + PDF.pdfSavePath(receipt.receiptNumber)
-            val file = File(outputPath)
-            // Ensure parent directories exist
-            file.parentFile?.mkdirs()
+            // 2. If requested, save the generated data to a local file
+            if (isWantToSavePDFLocally) {
+                val outputPath =
+                    System.getProperty("user.home") + PDF.pdfSavePath(receipt.receiptNumber)
+                val file = File(outputPath)
+                // Ensure parent directories exist
+                file.parentFile?.mkdirs()
 
-            FileOutputStream(file).use { fileStream ->
-                fileStream.write(pdfData)
+                FileOutputStream(file).use { fileStream ->
+                    fileStream.write(pdfData)
+                }
+                println("✅ PDF saved to: ${file.absolutePath}")
             }
-            println("✅ PDF saved to: ${file.absolutePath}")
 
             // 3. Finally, return the data for printing
             pdfData

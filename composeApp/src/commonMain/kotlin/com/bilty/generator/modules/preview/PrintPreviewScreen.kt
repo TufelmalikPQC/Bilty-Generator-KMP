@@ -50,7 +50,6 @@ import com.bilty.generator.uiToolKit.PreviewTabs
 import com.bilty.generator.uiToolKit.PrintOptionsBottomSheet
 import com.bilty.generator.uiToolKit.generateRoadLineDeliveryReceipt
 import com.bilty.generator.uiToolKit.getDemoRoadLineDeliveryReceipt
-import com.bilty.generator.uiToolKit.getHtmlPageZoomLevel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -79,13 +78,13 @@ fun PrintPreviewScreen(navController: NavHostController) {
             receiptHtmlContent = generateRoadLineDeliveryReceipt(
                 getDemoRoadLineDeliveryReceipt(),
                 isPreviewWithImageBitmap = false,
-                zoomLevel = getHtmlPageZoomLevel()
+                isForPreview = true
             )
 
             receiptHtmlContentWithImage = generateRoadLineDeliveryReceipt(
                 getDemoRoadLineDeliveryReceipt(),
                 isPreviewWithImageBitmap = true,
-                zoomLevel = getHtmlPageZoomLevel()
+                isForPreview = true
             )
         } catch (e: Exception) {
             error = e.message ?: "Unknown error occurred"
@@ -201,13 +200,15 @@ fun PrintPreviewScreen(navController: NavHostController) {
 
                                             receiptHtmlContent = generateRoadLineDeliveryReceipt(
                                                 getDemoRoadLineDeliveryReceipt(),
-                                                isPreviewWithImageBitmap = false
+                                                isPreviewWithImageBitmap = false,
+                                                false
                                             )
 
                                             receiptHtmlContentWithImage =
                                                 generateRoadLineDeliveryReceipt(
                                                     getDemoRoadLineDeliveryReceipt(),
-                                                    isPreviewWithImageBitmap = true
+                                                    isPreviewWithImageBitmap = true,
+                                                    false
                                                 )
                                         } catch (e: Exception) {
                                             error = e.message ?: "Unknown error occurred"

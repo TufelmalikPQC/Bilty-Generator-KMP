@@ -25,10 +25,16 @@ class PdfGeneratorWeb : PdfGenerator {
     override suspend fun generatePdf(
         receipt: RoadLineDeliveryReceipt,
         isPreviewWithImageBitmap: Boolean,
+        isWantToSavePDFLocally: Boolean,
         zoomLevel: Double
     ): ByteArray? {
         return try {
-            val html = generateRoadLineDeliveryReceipt(receipt, isPreviewWithImageBitmap,zoomLevel)
+            val html = generateRoadLineDeliveryReceipt(
+                receipt,
+                isPreviewWithImageBitmap,
+                false,
+                zoomLevel
+            )
             val div = document.createElement("div") as org.w3c.dom.HTMLDivElement
             div.innerHTML = html
             document.body?.appendChild(div)

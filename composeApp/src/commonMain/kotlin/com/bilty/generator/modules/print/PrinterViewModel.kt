@@ -41,18 +41,32 @@ class PrinterViewModel {
 
     init {
         loadPrinters()
-        loadDefaultPDFData()
+//        loadDefaultPDFData()
     }
 
     private fun loadDefaultPDFData() {
         viewModelScope.launch {
-            defaultPdfData.emit(
-                getPdfGenerator().generatePdf(
+            try {
+                println("🔄 Loading default PDF data...")
+                val pdfData = getPdfGenerator().generatePdf(
                     receipt = getDemoRoadLineDeliveryReceipt(),
                     isPreviewWithImageBitmap = false,
+                    isWantToSavePDFLocally = false,
                     zoomLevel = getHtmlPageZoomLevel()
-                ) ?: ByteArray(0)
-            )
+                )
+
+                if (pdfData?.isNotEmpty() == true) {
+                    println("✅ Default PDF data loaded successfully: ${pdfData.size} bytes")
+                    defaultPdfData.emit(pdfData)
+                } else {
+                    println("❌ Failed to load default PDF data - received null or empty data")
+                    defaultPdfData.emit(ByteArray(0))
+                }
+            } catch (e: Exception) {
+                println("❌ Error loading default PDF data: ${e.message}")
+                e.printStackTrace()
+                defaultPdfData.emit(ByteArray(0))
+            }
         }
     }
 
@@ -63,7 +77,22 @@ class PrinterViewModel {
     fun onPrintClicked(pdfData: ByteArray) {
         viewModelScope.launch {
             val selectedPrinter = _uiState.value.selectedPrinterName
+            println("📄 Received PDF data for printing: ${pdfData.size} bytes")
             println("🖨️ Sending print job to '${selectedPrinter ?: "default printer"}'...")
+
+            // Validate PDF data before proceeding
+            if (pdfData.isEmpty()) {
+                println("❌ Error: PDF data is empty, cannot proceed with printing")
+                _uiState.update {
+                    it.copy(
+                        isPrinting = false,
+                        printProgress = 0,
+                        printStatusMessage = "Error: PDF data is empty",
+                        lastPrintStatus = PrintStatus.FAILED
+                    )
+                }
+                return@launch
+            }
 
             // Show printing bottom sheet
             _uiState.update {
@@ -92,6 +121,7 @@ class PrinterViewModel {
                         PrintStatus.FAILED -> "Print failed."
                         PrintStatus.PENDING -> "Print pending."
                         PrintStatus.NOT_SUPPORTED -> "Printing not supported on this platform."
+                        PrintStatus.NOT_STARTED -> "Not Started"
                     },
                     lastPrintStatus = status
                 )
@@ -145,6 +175,7 @@ class PrinterViewModel {
                 val pdfData = getPdfGenerator().generatePdf(
                     receipt = getDemoRoadLineDeliveryReceipt(),
                     isPreviewWithImageBitmap = isPreviewWithImageBitmap,
+                    isWantToSavePDFLocally = false,
                     zoomLevel = getHtmlPageZoomLevel()
                 )
 
