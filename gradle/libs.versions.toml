@@ -23,11 +23,9 @@ openhtmltopdfPdfbox = "1.0.10"
 navigationCompose = "2.9.0-beta04"
 kotlinxSerializationJson = "1.9.0"
 kotlinx-serialization = "2.2.0"
-pdfbox = "3.0.5"
 
 [libraries]
 compose-webview-multiplatform = { module = "io.github.kevinnzou:compose-webview-multiplatform", version.ref = "composeWebviewMultiplatform" }
-compose-webview-multiplatform-desktop = { module = "io.github.kevinnzou:compose-webview-multiplatform-desktop", version.ref = "composeWebviewMultiplatform" }
 javafx-web = { module = "org.openjfx:javafx-web", version.ref = "javafxWeb" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
@@ -46,7 +44,6 @@ ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
 openhtmltopdf-pdfbox = { module = "com.openhtmltopdf:openhtmltopdf-pdfbox", version.ref = "openhtmltopdfPdfbox" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-pdfbox = { module = "org.apache.pdfbox:pdfbox", version.ref = "pdfbox" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

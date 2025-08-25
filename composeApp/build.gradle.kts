@@ -93,16 +93,12 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
         }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             // Html to PDF
             implementation(libs.openhtmltopdf.pdfbox)
-
-            // print pdf
-            //implementation(libs.pdfbox)
         }
     }
 }
@@ -150,15 +146,29 @@ compose.desktop {
               * macOS: .dmg (Disk Image)
              */
             targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Msi, TargetFormat.Deb)
+            val appName = "Bilty Generator"
             packageName = "com.bilty.generator"
             packageVersion = "1.0.0"
 
             // Optional: You can add more metadata
             description = "Bilty Generator Application"
             copyright = "© 2025 Your Company. All rights reserved."
+
+            macOS {
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/pqc_logo_ico.ico"))
+                packageName = appName
+            }
+            windows {
+                packageName = appName
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/pqc_logo_ico.ico"))
+            }
+            linux {
+                packageName = appName
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/pqc_logo_ico.ico"))
+            }
         }
 
-        // Required JVM arguments for KCEF
+        // Required for files browser
         jvmArgs("--add-opens", "java.desktop/sun.awt=ALL-UNNAMED")
         jvmArgs("--add-opens", "java.desktop/java.awt.peer=ALL-UNNAMED")
 
@@ -168,7 +178,7 @@ compose.desktop {
             jvmArgs("--add-opens", "java.desktop/sun.lwawt.macosx=ALL-UNNAMED")
         }
 
-        // ProGuard configuration for release builds
+        // ProGuard configuration for release builds (currently disabled)
         buildTypes.release.proguard {
             configurationFiles.from("compose-desktop.pro")
         }

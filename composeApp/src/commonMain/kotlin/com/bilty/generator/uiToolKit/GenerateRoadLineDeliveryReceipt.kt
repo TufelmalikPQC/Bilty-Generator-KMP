@@ -10,8 +10,6 @@ suspend fun generateRoadLineDeliveryReceipt(
     isForPreview: Boolean,
     zoomLevel: Double = getHtmlPageZoomLevel()
 ): String {
-    println("isForPreview-> $isForPreview")
-
 
     val receiptImageBase64 = getImageAsBase64Code(RECEIPT_IMAGE_PATH)
 
@@ -21,31 +19,6 @@ suspend fun generateRoadLineDeliveryReceipt(
         "background-color: transparent;"
     }
 
-    if(isForPreview){
-      """
-          html, body {
-                    width: 100%;
-                    height: 100%;
-                    margin: 0;
-                    padding: 0;
-                    font-family: Arial, sans-serif;
-                    zoom: $zoomLevel;
-                    transform: scale($zoomLevel);
-                    overflow: auto;
-                }
-      """.trimIndent()
-    }else{
-        """
-            html, body {
-                    width: 100%;
-                    height: 100%;
-                    margin: 0;
-                    padding: 0;
-                    font-family: Arial, sans-serif;
-                    overflow: auto;
-                }
-        """.trimIndent()
-    }
 
     return """
         <!DOCTYPE html>

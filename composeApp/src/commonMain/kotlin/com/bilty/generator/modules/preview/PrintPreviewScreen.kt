@@ -1,6 +1,7 @@
 package com.bilty.generator.modules.preview
 
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,9 +39,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.bilty.generator.bridge.openUrlInBrowser
 import com.bilty.generator.getPlatform
 import com.bilty.generator.model.constants.Constants
 import com.bilty.generator.modules.AppRoutes
@@ -59,6 +62,7 @@ fun PrintPreviewScreen(navController: NavHostController) {
     var receiptHtmlContent by remember { mutableStateOf<String?>(null) }
     var receiptHtmlContentWithImage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(true) }
+    var isSelectedPreviewImage by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
 
     println("Platform: ${getPlatform().name}")
@@ -232,14 +236,39 @@ fun PrintPreviewScreen(navController: NavHostController) {
                         modifier = Modifier.padding(bottom = 24.dp)
                     )
 
+                    if (getPlatform().name.contains(Constants.Platforms.PLATFORM_DESKTOP)) {
+                        Text(
+                            text = if (isSelectedPreviewImage) {
+                                "Click to open the browser with background receipt image."
+                            } else {
+                                "Click to open the browser to show raw receipt data."
+                            },
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Blue,
+                            modifier = Modifier.padding(bottom = 24.dp)
+                                .clickable {
+                                    scope.launch {
+                                        openUrlInBrowser(
+                                            generateRoadLineDeliveryReceipt(
+                                                getDemoRoadLineDeliveryReceipt(),
+                                                isPreviewWithImageBitmap = isSelectedPreviewImage,
+                                                false
+                                            )
+                                        )
+                                    }
+                                }
+                        )
+                    }
+
                     // Preview Cards in Column for better layout
                     Column(
                         verticalArrangement = Arrangement.spacedBy(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
                         PreviewTabs(
                             htmlContentWithImage = {
+                                isSelectedPreviewImage = true
                                 // Preview 1: With Background Image
                                 PrintPreviewCard(
                                     title = "With Background Image",
@@ -248,6 +277,7 @@ fun PrintPreviewScreen(navController: NavHostController) {
                                 )
                             },
                             htmlContentWithoutImage = {
+                                isSelectedPreviewImage = false
                                 // Preview 2: Content Only
                                 PrintPreviewCard(
                                     title = "Content Only",

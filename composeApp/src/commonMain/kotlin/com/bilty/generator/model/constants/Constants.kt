@@ -1,8 +1,11 @@
 package com.bilty.generator.model.constants
 
-object Constants {
+import biltygenerator.composeapp.generated.resources.Res
+import biltygenerator.composeapp.generated.resources.pqc_logo
 
+object Constants {
     const val RECEIPT_IMAGE_PATH = "transport_road_line_invoice.jpeg"
+    val DESKTOP_ICON = Res.drawable.pqc_logo
 
     object Platforms {
         const val PLATFORM_ANDROID = "Android"
