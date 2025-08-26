@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bilty.generator.bridge.getPdfGenerator
+import com.bilty.generator.model.enums.PrintOrientation
 import com.bilty.generator.modules.print.components.EmptyPrinterListView
 import com.bilty.generator.modules.print.components.PrinterRow
 import com.bilty.generator.uiToolKit.PrintingStatusBottomSheet
@@ -46,28 +47,44 @@ import com.bilty.generator.uiToolKit.getHtmlPageZoomLevel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrinterScreen(navController: NavHostController, isPreviewWithImageBitmap: Boolean) {
+fun PrinterScreen(
+    navController: NavHostController,
+    isPreviewWithImageBitmap: Boolean,
+    fontSize: Int,
+    isLandscapeMode: Boolean,
+    fontFamilyName: String
+) {
     val viewModel = PrinterViewModel()
     val uiState by viewModel.uiState.collectAsState()
-    val isPrintDotMatrixFormat by remember { mutableStateOf(true) }
     var receiptHtmlByteArray by remember { mutableStateOf<ByteArray?>(null) }
     var isPdfGenerating by remember { mutableStateOf(true) }
 
+    LaunchedEffect(Unit) {
+        viewModel.updateFontSize(size = fontSize.toString())
+        viewModel.updateSelectedOrientation(
+            orientation = if (isLandscapeMode) PrintOrientation.LANDSCAPE.value
+            else PrintOrientation.PORTRAIT.value
+        )
+        viewModel.updateFontFamily(fontFamily = fontFamilyName)
+    }
 
     LaunchedEffect(Unit) {
         try {
-            println("🔄 Starting PDF generation...")
+            println("Starting PDF generation...")
             val pdfData = getPdfGenerator().generatePdf(
                 receipt = getDemoRoadLineDeliveryReceipt(),
                 isPreviewWithImageBitmap = isPreviewWithImageBitmap,
                 isWantToSavePDFLocally = false,
-                zoomLevel = getHtmlPageZoomLevel()
+                zoomLevel = getHtmlPageZoomLevel(),
+                fontSize = fontSize,
+                isLandscapeMode = isLandscapeMode,
+                fontFamilyName = fontFamilyName
             )
             receiptHtmlByteArray = pdfData
             isPdfGenerating = false
-            println("✅ PDF generation completed in LaunchedEffect: ${pdfData?.size ?: 0} bytes")
+            println("PDF generation completed in LaunchedEffect: ${pdfData?.size ?: 0} bytes")
         } catch (e: Exception) {
-            println("❌ PDF generation failed in LaunchedEffect: ${e.message}")
+            println("PDF generation failed in LaunchedEffect: ${e.message}")
             e.printStackTrace()
             isPdfGenerating = false
         }
@@ -96,6 +113,7 @@ fun PrinterScreen(navController: NavHostController, isPreviewWithImageBitmap: Bo
                     itemVerticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(
+                        enabled = !isPdfGenerating,
                         onClick = {
                             receiptHtmlByteArray?.let { pdfData ->
                                 if (pdfData.isNotEmpty()) {
@@ -108,10 +126,6 @@ fun PrinterScreen(navController: NavHostController, isPreviewWithImageBitmap: Bo
                                 println("❌ Print button clicked but PDF data is null")
                             }
                         },
-                        /*   // Button is enabled only when PDF is ready, a printer is selected or if the list is empty
-                           enabled = !isPdfGenerating &&  receiptHtmlByteArray != null &&
-                                    receiptHtmlByteArray!!.isNotEmpty() &&
-                                    (uiState.selectedPrinterName != null || uiState.printers.isEmpty()),*/
                         modifier = Modifier.fillMaxWidth().height(50.dp)
                     ) {
                         if (isPdfGenerating) {
@@ -153,23 +167,6 @@ fun PrinterScreen(navController: NavHostController, isPreviewWithImageBitmap: Bo
                             DividerDefaults.color
                         )
                     }
-                    /*item {
-                        FlowRow(
-                            itemVerticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Start
-                        ) {
-                            Text(
-                                text = "Print Dot Matrix Format"
-                            )
-                            Spacer(Modifier.width(2.dp))
-                            Checkbox(
-                                colors = CheckboxDefaults.colors(),
-                                checked = isPrintDotMatrixFormat,
-                                onCheckedChange = { isPrintDotMatrixFormat = it },
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                        }
-                    }*/
                 }
             }
         }

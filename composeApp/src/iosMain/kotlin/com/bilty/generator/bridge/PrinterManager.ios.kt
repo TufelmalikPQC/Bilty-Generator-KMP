@@ -28,7 +28,13 @@ actual class PrinterManager {
         return emptyList()
     }
 
-    actual suspend fun printPdf(data: ByteArray, printerName: String?): PrintStatus {
+    actual suspend fun printPdf(
+        data: ByteArray,
+        printerName: String?,
+        fontSize: Int?,
+        isLandscapeMode: Boolean?,
+        fontFamilyName: String?
+    ): PrintStatus {
         val printController = UIPrintInteractionController.sharedPrintController
         if (printController == null || !UIPrintInteractionController.isPrintingAvailable()) {
             return PrintStatus.FAILED

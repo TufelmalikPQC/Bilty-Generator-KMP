@@ -5,6 +5,16 @@ import biltygenerator.composeapp.generated.resources.pqc_logo
 
 object Constants {
     const val RECEIPT_IMAGE_PATH = "transport_road_line_invoice.jpeg"
+
+    object Fonts {
+        const val FONT_FAMILY_NAME = "DynamicFontFamily"
+        const val DIGI_TRACE = "digi_trace.otf"
+        const val ENHANCED_DOT_DIGITAL_7 = "enhanced_dot_digital_7.ttf"
+        const val DOT_DIGITAL_7  = "dot_matrix.ttf"
+        const val DOT_MATRIX_7 = "dot_digital_7.ttf"
+        const val DIGITAL_7 = "digital_7.ttf"
+    }
+
     val DESKTOP_ICON = Res.drawable.pqc_logo
 
     object Platforms {

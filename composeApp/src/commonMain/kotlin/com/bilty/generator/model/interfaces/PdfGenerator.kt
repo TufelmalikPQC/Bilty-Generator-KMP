@@ -11,6 +11,9 @@ interface PdfGenerator {
         receipt: RoadLineDeliveryReceipt,
         isPreviewWithImageBitmap: Boolean,
         isWantToSavePDFLocally: Boolean,
-        zoomLevel: Double
+        zoomLevel: Double,
+        fontSize: Int,
+        isLandscapeMode: Boolean,
+        fontFamilyName: String
     ): ByteArray?
 }

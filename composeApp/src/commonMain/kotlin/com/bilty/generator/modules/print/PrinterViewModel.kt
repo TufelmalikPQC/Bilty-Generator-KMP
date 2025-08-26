@@ -4,6 +4,7 @@ package com.bilty.generator.modules.print
 import com.bilty.generator.bridge.PrinterManager
 import com.bilty.generator.bridge.getPdfGenerator
 import com.bilty.generator.model.data.PrinterScreenUiState
+import com.bilty.generator.model.enums.PrintOrientation
 import com.bilty.generator.model.enums.PrintStatus
 import com.bilty.generator.uiToolKit.getDemoRoadLineDeliveryReceipt
 import com.bilty.generator.uiToolKit.getHtmlPageZoomLevel
@@ -28,6 +29,24 @@ class PrinterViewModel {
     var defaultPdfData = MutableStateFlow(ByteArray(0))
         private set
 
+    var orientationsList = MutableStateFlow(listOf<PrintOrientation>())
+        private set
+
+    var selectedOrientations = MutableStateFlow(PrintOrientation.LANDSCAPE)
+        private set
+
+    var fontSizeList = MutableStateFlow(listOf<String>())
+        private set
+
+    var selectedFontSize = MutableStateFlow(24)
+        private set
+
+    var fontsList = MutableStateFlow(listOf<String>())
+        private set
+
+    var selectedFonts = MutableStateFlow("Dot Matrix")
+        private set
+
     fun resetPrintStatus() {
         _uiState.update {
             it.copy(
@@ -41,33 +60,9 @@ class PrinterViewModel {
 
     init {
         loadPrinters()
-//        loadDefaultPDFData()
-    }
-
-    private fun loadDefaultPDFData() {
-        viewModelScope.launch {
-            try {
-                println("🔄 Loading default PDF data...")
-                val pdfData = getPdfGenerator().generatePdf(
-                    receipt = getDemoRoadLineDeliveryReceipt(),
-                    isPreviewWithImageBitmap = false,
-                    isWantToSavePDFLocally = false,
-                    zoomLevel = getHtmlPageZoomLevel()
-                )
-
-                if (pdfData?.isNotEmpty() == true) {
-                    println("✅ Default PDF data loaded successfully: ${pdfData.size} bytes")
-                    defaultPdfData.emit(pdfData)
-                } else {
-                    println("❌ Failed to load default PDF data - received null or empty data")
-                    defaultPdfData.emit(ByteArray(0))
-                }
-            } catch (e: Exception) {
-                println("❌ Error loading default PDF data: ${e.message}")
-                e.printStackTrace()
-                defaultPdfData.emit(ByteArray(0))
-            }
-        }
+        loadFontsList()
+        loadOrientationList()
+        loadFontSizeList()
     }
 
     fun onPrinterSelected(printerName: String) {
@@ -108,7 +103,13 @@ class PrinterViewModel {
             launch { simulateProgressWhilePrinting() }
 
             // Actual print call
-            val status = printerManager.printPdf(pdfData, selectedPrinter)
+            val status = printerManager.printPdf(
+                data = pdfData,
+                printerName = selectedPrinter,
+                fontSize = selectedFontSize.value,
+                isLandscapeMode = selectedOrientations.value.value == "LANDSCAPE",
+                fontFamilyName = selectedFonts.value
+            )
 
             // Update final state
             _uiState.update {
@@ -176,7 +177,10 @@ class PrinterViewModel {
                     receipt = getDemoRoadLineDeliveryReceipt(),
                     isPreviewWithImageBitmap = isPreviewWithImageBitmap,
                     isWantToSavePDFLocally = false,
-                    zoomLevel = getHtmlPageZoomLevel()
+                    zoomLevel = getHtmlPageZoomLevel(),
+                    fontSize = selectedFontSize.value,
+                    isLandscapeMode = selectedOrientations.value == PrintOrientation.LANDSCAPE,
+                    fontFamilyName = selectedFonts.value
                 )
 
                 if (pdfData != null && pdfData.isNotEmpty()) {
@@ -194,4 +198,57 @@ class PrinterViewModel {
             }
         }
     }
+
+    fun loadOrientationList() {
+        viewModelScope.launch {
+            orientationsList.emit(
+                listOf(
+                    PrintOrientation.LANDSCAPE,
+                    PrintOrientation.PORTRAIT
+                )
+            )
+        }
+    }
+
+    fun loadFontsList() {
+        viewModelScope.launch {
+            fontsList.emit(
+                listOf(
+                    "Dot Matrix",
+                    "Enhanced Dot Matrix",
+                    "Digi Trace",
+                    "Dot Digital-7",
+                    "Digital-7"
+                )
+            )
+        }
+    }
+
+    fun loadFontSizeList() {
+        viewModelScope.launch {
+            fontSizeList.emit((12..60 step 2).map { it.toString() })
+        }
+    }
+
+    fun updateFontSize(size: String) {
+        viewModelScope.launch {
+            selectedFontSize.emit(size.toInt())
+        }
+    }
+
+    fun updateFontFamily(fontFamily: String) {
+        viewModelScope.launch {
+            selectedFonts.emit(fontFamily)
+        }
+    }
+
+    fun updateSelectedOrientation(orientation: String) {
+        viewModelScope.launch {
+            val matched = orientationsList.value.find { it.value == orientation }
+            if (matched != null) {
+                selectedOrientations.emit(matched)
+            }
+        }
+    }
+
 }

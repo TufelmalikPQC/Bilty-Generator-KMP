@@ -26,7 +26,10 @@ class PdfGeneratorIos : PdfGenerator {
         receipt: RoadLineDeliveryReceipt,
         isPreviewWithImageBitmap: Boolean,
         isWantToSavePDFLocally: Boolean,
-        zoomLevel: Double
+        zoomLevel: Double,
+        fontSize: Int,
+        isLandscapeMode: Boolean,
+        fontFamilyName: String
     ): ByteArray? { // <-- Return ByteArray?
         return try {
             val html = generateRoadLineDeliveryReceipt(

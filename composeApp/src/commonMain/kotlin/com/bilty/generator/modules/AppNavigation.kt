@@ -8,5 +8,10 @@ sealed class AppRoutes {
     data object PrintPreviewScreen : AppRoutes()
 
     @Serializable
-    data class PrinterScreen(var isPreviewWithImageBitmap: Boolean) : AppRoutes()
+    data class PrinterScreen(
+        var isPreviewWithImageBitmap: Boolean,
+        var fontSize: Int,
+        var isLandscapeMode: Boolean,
+        var fontFamilyName: String
+    ) : AppRoutes()
 }

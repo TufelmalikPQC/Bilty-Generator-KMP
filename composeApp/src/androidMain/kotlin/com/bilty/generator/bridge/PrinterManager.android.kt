@@ -22,7 +22,13 @@ actual class PrinterManager {
         return emptyList()
     }
 
-    actual suspend fun printPdf(data: ByteArray, printerName: String?): PrintStatus {
+    actual suspend fun printPdf(
+        data: ByteArray,
+        printerName: String?,
+        fontSize: Int?,
+        isLandscapeMode: Boolean?,
+        fontFamilyName: String?
+    ): PrintStatus {
         val printManager = androidContextActivity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager
             ?: return PrintStatus.FAILED
 

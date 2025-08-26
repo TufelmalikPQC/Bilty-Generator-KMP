@@ -1,6 +1,5 @@
 package com.bilty.generator.bridge
 
-import com.bilty.generator.model.PrintData
 import com.bilty.generator.model.data.PrinterInfo
 import com.bilty.generator.model.enums.PrintStatus
 
@@ -23,6 +22,12 @@ expect class PrinterManager() {
      * @param printerName The name of a specific printer to use (Desktop only). If null, a default is used.
      * @return A [PrintStatus] indicating the outcome.
      */
-    suspend fun printPdf(data: ByteArray, printerName: String? = null): PrintStatus
+    suspend fun printPdf(
+        data: ByteArray,
+        printerName: String? = null,
+        fontSize: Int? = 22,
+        isLandscapeMode: Boolean? = true,
+        fontFamilyName: String? = "Dot Matrix"
+    ): PrintStatus
 
 }

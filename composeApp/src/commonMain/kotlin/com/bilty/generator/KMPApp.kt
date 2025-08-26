@@ -25,13 +25,20 @@ fun KMPApp() {
             }
 
             composable<AppRoutes.PrinterScreen> { route ->
-                route.savedStateHandle.get<Boolean>("isPreviewWithImageBitmap")
-                    ?.let {
-                        PrinterScreen(
-                            navController = navController,
-                            isPreviewWithImageBitmap = it
-                        )
-                    }
+                route.savedStateHandle.apply {
+                    val isPreviewWithImageBitmap = get<Boolean>("isPreviewWithImageBitmap") ?: false
+                    val fontSize = get<Int>("fontSize") ?: 24
+                    val isLandscapeMode = get<Boolean>("isLandscapeMode") ?: false
+                    val fontFamilyName = get<String>("fontFamilyName") ?: "Dot Matrix"
+
+                    PrinterScreen(
+                        navController = navController,
+                        isPreviewWithImageBitmap = isPreviewWithImageBitmap,
+                        fontSize = fontSize,
+                        isLandscapeMode = isLandscapeMode,
+                        fontFamilyName = fontFamilyName
+                    )
+                }
             }
         }
     }

@@ -21,7 +21,14 @@ actual class PrinterManager {
         }
     }
 
-    actual suspend fun printPdf(data: ByteArray, printerName: String?): PrintStatus {
+
+    actual suspend fun printPdf(
+        data: ByteArray,
+        printerName: String?,
+        fontSize: Int?,
+        isLandscapeMode: Boolean?,
+        fontFamilyName: String?
+    ): PrintStatus {
         println("🖨️ PrinterManager.printPdf called with ${data.size} bytes of data")
 
         // This function now assumes valid PDF data is being passed in.

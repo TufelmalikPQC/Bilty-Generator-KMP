@@ -15,7 +15,13 @@ actual class PrinterManager {
         return emptyList()
     }
 
-    actual suspend fun printPdf(data: ByteArray, printerName: String?): PrintStatus {
+    actual suspend fun printPdf(
+        data: ByteArray,
+        printerName: String?,
+        fontSize: Int?,
+        isLandscapeMode: Boolean?,
+        fontFamilyName: String?
+    ): PrintStatus {
         return try {
             val int8Array = Int8Array(data.size)
             data.forEachIndexed { index, byte ->

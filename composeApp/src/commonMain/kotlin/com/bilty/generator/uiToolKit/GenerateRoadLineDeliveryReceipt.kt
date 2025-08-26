@@ -1,5 +1,6 @@
 package com.bilty.generator.uiToolKit
 
+import com.bilty.generator.model.constants.Constants.Fonts.FONT_FAMILY_NAME
 import com.bilty.generator.model.constants.Constants.RECEIPT_IMAGE_PATH
 import com.bilty.generator.model.data.BiltyChargesTable
 import com.bilty.generator.model.data.RoadLineDeliveryReceipt
@@ -8,7 +9,9 @@ suspend fun generateRoadLineDeliveryReceipt(
     receipt: RoadLineDeliveryReceipt,
     isPreviewWithImageBitmap: Boolean,
     isForPreview: Boolean,
-    zoomLevel: Double = getHtmlPageZoomLevel()
+    zoomLevel: Double = getHtmlPageZoomLevel(),
+    fontSize: Int = 22,
+    isLandscapeMode: Boolean = false
 ): String {
 
     val receiptImageBase64 = getImageAsBase64Code(RECEIPT_IMAGE_PATH)
@@ -28,6 +31,11 @@ suspend fun generateRoadLineDeliveryReceipt(
             <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
             <title>Lunia Roadlines - Delivery Receipt</title>
             <style>
+                @font-face {
+                  font-family: '$FONT_FAMILY_NAME';
+                  src: local('$FONT_FAMILY_NAME');
+                }
+
                 * {
                     margin: 0;
                     padding: 0;
@@ -40,12 +48,12 @@ suspend fun generateRoadLineDeliveryReceipt(
                     margin: 0;
                     padding: 0;
                     ${if (isForPreview) "zoom: $zoomLevel; transform: scale($zoomLevel);" else ""}
-                    font-family: Arial, sans-serif;
-                    overflow: auto;
+                    font-family: '$FONT_FAMILY_NAME', sans-serif;
+                    font-size: ${fontSize}px;
                 }
 
                 @page {
-                    size: landscape;
+                    size: ${if (isLandscapeMode) "landscape" else "portrait"};
                     margin: 0;
                 }
 
@@ -65,20 +73,8 @@ suspend fun generateRoadLineDeliveryReceipt(
                     position: absolute;
                     border: none;
                     background: transparent;
-                    font-size: 24px;
+                    font-size: 1em;
                     padding: 2px;
-                    outline: none;
-                }
-
-                textarea.form-field {
-                    font-family: Arial, sans-serif;
-                }
-
-                @media print {
-                    body {
-                        -webkit-print-color-adjust: exact;
-                        print-color-adjust: exact;
-                    }
                 }
             </style>
         </head>
@@ -97,14 +93,14 @@ suspend fun generateRoadLineDeliveryReceipt(
                 <div class="form-field" style="left: 20.57%; top: 76.22%;">${receipt.particulars}</div>
                 <div class="form-field" style="left: 20.57%; top: 84.51%;">${receipt.pMarka}</div>
 
-                <div class="form-field" style="left: 77.27%; top: 25.98%; width: 140px; text-align: right;">${receipt.biltyChargesTable.freight}</div>
-                <div class="form-field" style="left: 77.27%; top: 34.76%; width: 140px; text-align: right;">${receipt.biltyChargesTable.charity}</div>
-                <div class="form-field" style="left: 77.27%; top: 43.29%; width: 140px; text-align: right;">${receipt.biltyChargesTable.handling}</div>
-                <div class="form-field" style="left: 77.27%; top: 51.34%; width: 140px; text-align: right;">${receipt.biltyChargesTable.delivery}</div>
-                <div class="form-field" style="left: 77.27%; top: 59.76%; width: 140px; text-align: right;">${receipt.biltyChargesTable.ddCharges}</div>
-                <div class="form-field" style="left: 77.27%; top: 68.05%; width: 140px; text-align: right;">${receipt.biltyChargesTable.demurrage}</div>
-                <div class="form-field" style="left: 77.27%; top: 75.98%; width: 140px; text-align: right;">${receipt.biltyChargesTable.otherCharges}</div>
-                <div class="form-field" style="left: 77.27%; top: 80.98%; width: 140px; text-align: right; font-weight: bold; font-size: 1.625em;">${receipt.biltyChargesTable.grandTotal}</div>
+                <div class="form-field" style="left: 75.27%; top: 25.98%; width: 140px; text-align: right;">${receipt.biltyChargesTable.freight}</div>
+                <div class="form-field" style="left: 75.27%; top: 34.76%; width: 140px; text-align: right;">${receipt.biltyChargesTable.charity}</div>
+                <div class="form-field" style="left: 75.27%; top: 43.29%; width: 140px; text-align: right;">${receipt.biltyChargesTable.handling}</div>
+                <div class="form-field" style="left: 75.27%; top: 51.34%; width: 140px; text-align: right;">${receipt.biltyChargesTable.delivery}</div>
+                <div class="form-field" style="left: 75.27%; top: 59.76%; width: 140px; text-align: right;">${receipt.biltyChargesTable.ddCharges}</div>
+                <div class="form-field" style="left: 75.27%; top: 68.05%; width: 140px; text-align: right;">${receipt.biltyChargesTable.demurrage}</div>
+                <div class="form-field" style="left: 75.27%; top: 75.98%; width: 140px; text-align: right;">${receipt.biltyChargesTable.otherCharges}</div>
+                <div class="form-field" style="left: 75.27%; top: 80.01%; width: 140px; text-align: right; font-weight: bold; font-size: 1.605em;">${receipt.biltyChargesTable.grandTotal}</div>
             </div>
         </body>
         </html>

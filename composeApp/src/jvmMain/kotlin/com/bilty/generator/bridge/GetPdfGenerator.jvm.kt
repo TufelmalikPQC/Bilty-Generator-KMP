@@ -1,9 +1,11 @@
 package com.bilty.generator.bridge
 
+import com.bilty.generator.model.constants.Constants.Fonts.FONT_FAMILY_NAME
 import com.bilty.generator.model.constants.PDF
 import com.bilty.generator.model.data.RoadLineDeliveryReceipt
 import com.bilty.generator.model.interfaces.PdfGenerator
 import com.bilty.generator.uiToolKit.generateRoadLineDeliveryReceipt
+import com.bilty.generator.uiToolKit.getFontFamilyName
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,27 +19,53 @@ class PdfGeneratorDesktop : PdfGenerator {
         receipt: RoadLineDeliveryReceipt,
         isPreviewWithImageBitmap: Boolean,
         isWantToSavePDFLocally: Boolean,
-        zoomLevel: Double
+        zoomLevel: Double,
+        fontSize: Int,
+        isLandscapeMode: Boolean,
+        fontFamilyName: String
     ): ByteArray? = withContext(Dispatchers.IO) {
         return@withContext try {
             println("Content Data : ${receipt.receiptNumber}")
             val html = generateRoadLineDeliveryReceipt(
-                receipt,
-                isPreviewWithImageBitmap,
-                false,
-                zoomLevel
+                receipt = receipt,
+                isPreviewWithImageBitmap = isPreviewWithImageBitmap,
+                isForPreview = false,
+                zoomLevel = zoomLevel,
+                fontSize = fontSize,
+                isLandscapeMode = isLandscapeMode
             )
-            println("Content Html Is Not Empty : ${html.isNotEmpty()}")
+
+            println("Content Html Is Empty : ${html.isEmpty()}")
             // 1. Generate the PDF into memory first
             val outputStream = java.io.ByteArrayOutputStream()
 
-            PdfRendererBuilder().run {
-                withHtmlContent(html, null)
-                toStream(outputStream)
-                run() // This is crucial - actually builds the PDF
+
+
+            try {
+                val fontName = getFontFamilyName(fontFamilyName)
+                val url = this::class.java.classLoader.getResource(fontName)
+                println("Resolved font URL: $url")
+
+                val fontStream = this::class.java.classLoader
+                    .getResourceAsStream(fontName)
+                    ?: throw IllegalArgumentException("Font resource not found")
+
+                PdfRendererBuilder().run {
+                    useFont({ fontStream }, FONT_FAMILY_NAME)
+                    withHtmlContent(html, null)
+                    toStream(outputStream)
+                    run()
+                }
+
+            } catch (e: Exception) {
+                println("PDF generation failed: ${e.message}")
+                e.printStackTrace()
+                return@withContext null
             }
+
+
             val pdfData = outputStream.toByteArray()
-            
+
             println("📄 PDF generation completed: ${pdfData.size} bytes")
 
             // 2. If requested, save the generated data to a local file
