@@ -94,12 +94,10 @@ fun PrinterScreen(
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Select a Printer") }, actions = {
-                Button(onClick = {}) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack, "",
-                        modifier = Modifier.clickable {
-                            navController.popBackStack()
-                        })
+                Button(onClick = {
+                    navController.popBackStack()
+                }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "")
                 }
             })
         },

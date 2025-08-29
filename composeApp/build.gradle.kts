@@ -82,9 +82,6 @@ kotlin {
             // Serialization
             implementation(libs.kotlinx.serialization.json)
 
-            // Web-view
-            implementation(libs.compose.webview.multiplatform)
-
             // Material
             implementation(compose.materialIconsExtended)
 

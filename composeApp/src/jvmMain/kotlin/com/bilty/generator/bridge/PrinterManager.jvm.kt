@@ -1,11 +1,13 @@
 package com.bilty.generator.bridge
 
+import com.bilty.generator.model.constants.Constants.RECEIPT_HEIGHT_POINTS
+import com.bilty.generator.model.constants.Constants.RECEIPT_WIDTH_POINTS
 import com.bilty.generator.model.data.PrinterInfo
 import com.bilty.generator.model.enums.PrintStatus
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.printing.PDFPrintable
-import org.apache.pdfbox.printing.Scaling
 import java.awt.print.PageFormat
+import java.awt.print.Paper
 import java.awt.print.PrinterJob
 import javax.print.PrintService
 import javax.print.PrintServiceLookup
@@ -29,6 +31,7 @@ actual class PrinterManager {
         isLandscapeMode: Boolean?,
         fontFamilyName: String?
     ): PrintStatus {
+        println("printPdf() -> isLandscapeMode : $isLandscapeMode")
         println("🖨️ PrinterManager.printPdf called with ${data.size} bytes of data")
 
         // This function now assumes valid PDF data is being passed in.
@@ -66,18 +69,37 @@ actual class PrinterManager {
 
             // Create a PageFormat in landscape
             val pageFormat = job.defaultPage()
-            pageFormat.orientation = PageFormat.LANDSCAPE
-            println("🖨️ Showing print dialog...")
-            if (job.printDialog()) {
-                println("✅ User confirmed print, starting print job...")
-                job.setPrintable(PDFPrintable(document, Scaling.STRETCH_TO_FIT), pageFormat)
-                job.print()
-                println("✅ Print job completed successfully")
-                PrintStatus.SUCCESS
+            pageFormat.orientation =
+                if (isLandscapeMode == true) PageFormat.LANDSCAPE else PageFormat.PORTRAIT
+
+
+
+            val paper = Paper()
+            if (isLandscapeMode == true) {
+                paper.setSize(RECEIPT_HEIGHT_POINTS, RECEIPT_WIDTH_POINTS)
+//                paper.setImageableArea(0.0, 0.0, receiptHeightPoints, receiptWidthPoints)
+                println("printPdf() -> isLandscapeMode = ")
             } else {
-                println("⚠️ User cancelled print dialog")
-                PrintStatus.CANCELLED
+                paper.setSize(RECEIPT_WIDTH_POINTS, RECEIPT_HEIGHT_POINTS)
+//                paper.setImageableArea(0.0, 0.0, receiptWidthPoints, receiptHeightPoints)
+                println("printPdf() -> isLandscapeMode = true")
             }
+            pageFormat.paper = paper
+
+            println("🖨 Showing print dialog...")
+            job.setPrintable(PDFPrintable(document), pageFormat)
+            job.print()
+            PrintStatus.SUCCESS
+            /* if (job.printDialog()) {
+                 println("User confirmed print, starting print job...")
+                 job.setPrintable(PDFPrintable(document),pageFormat)
+                 job.print()
+                 println("Print job completed successfully")
+                 PrintStatus.SUCCESS
+             } else {
+                 println("⚠ User cancelled print dialog")
+                 PrintStatus.CANCELLED
+             }*/
         } catch (e: Exception) {
             println("❌ Error during printing: ${e.message}")
             e.printStackTrace()

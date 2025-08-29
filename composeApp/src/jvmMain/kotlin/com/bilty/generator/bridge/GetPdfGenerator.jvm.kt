@@ -6,9 +6,11 @@ import com.bilty.generator.model.data.RoadLineDeliveryReceipt
 import com.bilty.generator.model.interfaces.PdfGenerator
 import com.bilty.generator.uiToolKit.generateRoadLineDeliveryReceipt
 import com.bilty.generator.uiToolKit.getFontFamilyName
+import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.apache.pdfbox.pdmodel.common.PDRectangle
 import java.io.File
 import java.io.FileOutputStream
 
@@ -52,8 +54,19 @@ class PdfGeneratorDesktop : PdfGenerator {
 
                 PdfRendererBuilder().run {
                     useFont({ fontStream }, FONT_FAMILY_NAME)
+
+                    /*// how to se the page size
+                    val size = PDRectangle( 4.1f * 72,5.8f * 72)
+
+                    useDefaultPageSize(
+                        size.width,
+                        size.height,
+                        BaseRendererBuilder.PageSizeUnits.INCHES
+                    )*/
+
                     withHtmlContent(html, null)
                     toStream(outputStream)
+
                     run()
                 }
 

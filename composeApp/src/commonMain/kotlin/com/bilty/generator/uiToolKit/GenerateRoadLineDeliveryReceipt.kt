@@ -1,7 +1,9 @@
 package com.bilty.generator.uiToolKit
 
 import com.bilty.generator.model.constants.Constants.Fonts.FONT_FAMILY_NAME
+import com.bilty.generator.model.constants.Constants.RECEIPT_HEIGHT_POINTS
 import com.bilty.generator.model.constants.Constants.RECEIPT_IMAGE_PATH
+import com.bilty.generator.model.constants.Constants.RECEIPT_WIDTH_POINTS
 import com.bilty.generator.model.data.BiltyChargesTable
 import com.bilty.generator.model.data.RoadLineDeliveryReceipt
 
@@ -51,17 +53,39 @@ suspend fun generateRoadLineDeliveryReceipt(
                     font-family: '$FONT_FAMILY_NAME', sans-serif;
                     font-size: ${fontSize}px;
                 }
-
+                
                 @page {
+                    size: ${if (isLandscapeMode) "landscape" else "portrait"}; /* Sets the page size to A4 in portrait orientation */
+                    margin: 0; /* Sets a 1cm margin on all sides of the page */
+                  }
+                  
+                  @media print {
+                        html, body {
+                            width: 100%;
+                            height: 100%;   
+                        }
+                        .page {
+                            margin: 0;
+                            border: initial;
+                            border-radius: initial;
+                            width: initial;
+                            min-height: initial;
+                            box-shadow: initial;
+                            background: initial;
+                            page-break-after: always;
+                        }
+                    }
+                
+                /*@page {
                     size: ${if (isLandscapeMode) "landscape" else "portrait"};
                     margin: 0;
-                }
+                }*/
 
                 .form-container {
                     position: relative;
                     width: 100%;
                     height: 100%;
-                    margin: 0 auto;
+                    margin: 0;
                     $backgroundImage
                     background-size: 100% 100%;
                     background-repeat: no-repeat;

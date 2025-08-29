@@ -1,14 +1,15 @@
 package com.bilty.generator.uiToolKit
 
 import com.bilty.generator.model.constants.Constants.Fonts
+import com.bilty.generator.model.constants.Constants.Fonts.BASE_PREFIX
 
 fun getFontFamilyName(fontFamilyName: String): String {
     return when (fontFamilyName) {
-        "Dot Matrix" -> "font/${Fonts.DOT_MATRIX_7}"
-        "Enhanced Dot Matrix" -> "font/${Fonts.ENHANCED_DOT_DIGITAL_7}"
-        "Digi Trace" -> "font/${Fonts.DIGI_TRACE}"
-        "Dot Digital-7" -> "font/${Fonts.DOT_DIGITAL_7}"
-        "Digital-7" -> "font/${Fonts.DIGITAL_7}"
-        else -> "font/${Fonts.DOT_MATRIX_7}"
+        "Dot Matrix" -> "$BASE_PREFIX${Fonts.DOT_MATRIX_7}"
+        "Enhanced Dot Matrix" -> "$BASE_PREFIX${Fonts.ENHANCED_DOT_DIGITAL_7}"
+        "Digi Trace" -> "$BASE_PREFIX${Fonts.DIGI_TRACE}"
+        "Dot Digital-7" -> "$BASE_PREFIX${Fonts.DOT_DIGITAL_7}"
+        "Digital-7" -> "$BASE_PREFIX${Fonts.DIGITAL_7}"
+        else -> "$BASE_PREFIX${Fonts.DOT_MATRIX_7}"
     }
 }
