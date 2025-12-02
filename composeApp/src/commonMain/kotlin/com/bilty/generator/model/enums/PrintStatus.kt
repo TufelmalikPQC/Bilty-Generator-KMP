@@ -1,10 +1,11 @@
 package com.bilty.generator.model.enums
 
 enum class PrintStatus {
-    SUCCESS,
+    NOT_STARTED,
+    PRINTING,
     CANCELLED,
     FAILED,
     PENDING,
     NOT_SUPPORTED,
-    NOT_STARTED,
+    COMPLETED
 }

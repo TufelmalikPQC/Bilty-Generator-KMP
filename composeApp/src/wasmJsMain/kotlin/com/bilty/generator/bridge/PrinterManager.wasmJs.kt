@@ -42,11 +42,11 @@ actual class PrinterManager {
         }
     }
 
-    actual suspend fun printBiltyText(textContent: String, printerName: String?): PrintStatus {
+    actual suspend fun printBiltyTextFileText(textContent: String, printerName: String?): PrintStatus {
         TODO("Not yet implemented")
     }
 
-    actual suspend fun printBiltyTextTest(printerName: String?): PrintStatus {
+    actual suspend fun printBiltyTextFile(printerName: String?): PrintStatus {
         TODO("Not yet implemented")
     }
 }

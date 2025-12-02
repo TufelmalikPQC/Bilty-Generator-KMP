@@ -13,6 +13,7 @@ composeHotReload = "1.0.0-beta05"
 composeMultiplatform = "1.8.2"
 javafxWeb = "24.0.2"
 junit = "4.13.2"
+kotlinxDatetime = "0.7.1"
 navigationUiKtx = "2.9.3"
 kotlin = "2.2.0"
 kotlinx-coroutines = "1.10.2"
@@ -27,10 +28,7 @@ kotlinx-serialization = "2.2.0"
 # Firebase
 firebaseCommon = "2.4.0"
 firebaseBom = "34.6.0"
-firebaseAuth = "2.4.0"
 firebaseStorage = "2.4.0"
-firebaseCrashlytics = "2.4.0"
-firebaseFirestore = "2.4.0"
 
 
 [libraries]
@@ -47,6 +45,7 @@ androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecyc
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 html-to-pdf-convertor = { module = "io.github.mddanishansari:html-to-pdf-convertor", version.ref = "htmlToPdfConvertor" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
 openhtmltopdf-pdfbox = { module = "com.openhtmltopdf:openhtmltopdf-pdfbox", version.ref = "openhtmltopdfPdfbox" }
@@ -57,11 +56,8 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 # Firebase
 firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebaseCommon" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
-firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebaseAuth" }
-firebase-storage = { module = "dev.gitlive:firebase-storage", version.ref = "firebaseStorage" }
 firebase-database = { module = "dev.gitlive:firebase-database", version.ref = "firebaseStorage" }
-firebase-crashlytics = { module = "dev.gitlive:firebase-crashlytics", version.ref = "firebaseCrashlytics" }
-firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebaseFirestore" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

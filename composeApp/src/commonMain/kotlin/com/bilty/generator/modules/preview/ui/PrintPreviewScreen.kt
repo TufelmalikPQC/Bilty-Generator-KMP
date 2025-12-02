@@ -1,4 +1,4 @@
-package com.bilty.generator.modules.preview
+package com.bilty.generator.modules.preview.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -37,16 +36,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.bilty.generator.getPlatform
 import com.bilty.generator.model.constants.Constants
 import com.bilty.generator.model.enums.PrintOption
 import com.bilty.generator.model.enums.PrintOrientation
 import com.bilty.generator.modules.AppRoutes
 import com.bilty.generator.modules.preview.components.PreviewOptionsCard
-import com.bilty.generator.modules.print.PrinterViewModel
+import com.bilty.generator.modules.print.ui.PrinterViewModel
+import com.bilty.generator.modules.printmethod.TextBiltyFilePrintButtons
 import com.bilty.generator.uiToolKit.CommonDropdown
 import com.bilty.generator.uiToolKit.CommonRadioGroup
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -208,7 +210,7 @@ fun PrintPreviewScreen(navController: NavHostController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Buttons
+                /*// Buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -226,10 +228,26 @@ fun PrintPreviewScreen(navController: NavHostController) {
                     ) {
                         Text("Confirm")
                     }
-                }
+                }*/
+
+                TextBiltyFilePrintButtons(
+                    isButtonsDisabled = selectedOption != null,
+                    onDirectPrint = {
+                        onConfirm(printWithImage = false)
+                    }, onPdfPrint = {
+                        onConfirm(printWithImage = true)
+                    }
+                )
+
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PrintPreviewScreenPreview() {
+    PrintPreviewScreen(navController = rememberNavController())
 }

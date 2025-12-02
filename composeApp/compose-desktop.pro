@@ -32,3 +32,17 @@
 # ✅ Disable shrinking and obfuscation (safe mode)
 -dontoptimize
 -dontobfuscate
+
+# ✅ Keep all resources (files, fonts, images, etc.)
+-keepclassmembers class ** {
+    *** getResource*(...);
+}
+
+# ✅ Keep resource loading classes
+-keep class org.jetbrains.compose.resources.** { *; }
+-keep class biltygenerator.composeapp.generated.resources.** { *; }
+
+# ✅ Preserve all files in resources directories
+-adaptresourcefilenames
+-adaptresourcefilecontents
+

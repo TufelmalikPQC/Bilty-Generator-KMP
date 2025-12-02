@@ -78,11 +78,8 @@ actual class PrinterManager {
         return PrintStatus.PENDING
     }
 
-    actual suspend fun printBiltyText(textContent: String, printerName: String?): PrintStatus {
-        TODO("Not yet implemented")
-    }
 
-    actual suspend fun printBiltyTextTest(printerName: String?): PrintStatus {
+    actual suspend fun printBiltyTextFile(printerName: String?): PrintStatus {
         TODO("Not yet implemented")
     }
 

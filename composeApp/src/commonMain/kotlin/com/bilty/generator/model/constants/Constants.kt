@@ -5,6 +5,7 @@ import biltygenerator.composeapp.generated.resources.pqc_logo
 
 object Constants {
     const val RECEIPT_IMAGE_PATH = "transport_road_line_invoice.jpeg"
+    const val BILTY_TEXT_FILE_PATH = "files/new_pqc_epson_lx.txt"
 
     object Fonts {
         const val BASE_PREFIX = "font/"

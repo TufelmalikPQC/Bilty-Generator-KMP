@@ -1,4 +1,4 @@
-package com.bilty.generator.modules.print
+package com.bilty.generator.modules.print.ui
 
 
 import com.bilty.generator.bridge.PrinterManager
@@ -38,7 +38,7 @@ class PrinterViewModel {
     var fontSizeList = MutableStateFlow(listOf<String>())
         private set
 
-    var selectedFontSize = MutableStateFlow(24)
+    var selectedFontSize = MutableStateFlow(12)
         private set
 
     var fontsList = MutableStateFlow(listOf<String>())
@@ -89,22 +89,26 @@ class PrinterViewModel {
             launch { simulateProgressWhilePrinting() }
 
             // Direct text print call
-            val status = printerManager.printBiltyTextTest(
-                selectedPrinter
+            val status = printerManager.printBiltyTextFile(
+                printerName = selectedPrinter,
+                fontSize = selectedFontSize.value,
+                isLandscapeMode = selectedOrientations.value.value == "LANDSCAPE",
+                fontFamilyName = selectedFonts.value
             )
 
             // Update final state
             _uiState.update {
                 it.copy(
                     isPrinting = false,
-                    printProgress = if (status == PrintStatus.SUCCESS) 100 else it.printProgress,
+                    printProgress = if (status == PrintStatus.COMPLETED) 100 else it.printProgress,
                     printStatusMessage = when (status) {
-                        PrintStatus.SUCCESS -> "Text printed successfully."
+                        PrintStatus.COMPLETED -> "Text printed successfully."
                         PrintStatus.CANCELLED -> "Print cancelled."
                         PrintStatus.FAILED -> "Print failed."
                         PrintStatus.PENDING -> "Print pending."
                         PrintStatus.NOT_SUPPORTED -> "Printing not supported on this platform."
                         PrintStatus.NOT_STARTED -> "Not Started"
+                        PrintStatus.PRINTING -> "Printing in progress..."
                     },
                     lastPrintStatus = status
                 )
@@ -160,14 +164,15 @@ class PrinterViewModel {
             _uiState.update {
                 it.copy(
                     isPrinting = false,
-                    printProgress = if (status == PrintStatus.SUCCESS) 100 else it.printProgress,
-                    printStatusMessage = when (status) {
-                        PrintStatus.SUCCESS -> "PDF printed successfully."
+                    printProgress = if (status == PrintStatus.COMPLETED) 100 else it.printProgress,
+                    printStatusMessage =  when (status) {
+                        PrintStatus.COMPLETED -> "PDF printed successfully."
                         PrintStatus.CANCELLED -> "Print cancelled."
                         PrintStatus.FAILED -> "Print failed."
                         PrintStatus.PENDING -> "Print pending."
                         PrintStatus.NOT_SUPPORTED -> "Printing not supported on this platform."
                         PrintStatus.NOT_STARTED -> "Not Started"
+                        PrintStatus.PRINTING -> "Printing in progress..."
                     },
                     lastPrintStatus = status
                 )

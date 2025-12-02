@@ -52,7 +52,7 @@ actual class PrinterManager {
             printController.presentAnimated(true) { _, completed, error ->
                 when {
                     error != null -> continuation.resume(PrintStatus.FAILED)
-                    completed -> continuation.resume(PrintStatus.SUCCESS) // User confirmed the print dialog
+                    completed -> continuation.resume(PrintStatus.COMPLETED) // User confirmed the print dialog
                     else -> continuation.resume(PrintStatus.CANCELLED)
                 }
             }
@@ -63,11 +63,9 @@ actual class PrinterManager {
 
     }
 
-    actual suspend fun printBiltyText(textContent: String, printerName: String?): PrintStatus {
-        TODO("Not yet implemented")
-    }
 
-    actual suspend fun printBiltyTextTest(printerName: String?): PrintStatus {
+
+    actual suspend fun printBiltyTextFile(printerName: String?): PrintStatus {
         TODO("Not yet implemented")
     }
 }

@@ -126,14 +126,15 @@ class PrinterViewModel {
             _uiState.update {
                 it.copy(
                     isPrinting = false,
-                    printProgress = if (status == PrintStatus.SUCCESS) 100 else it.printProgress,
+                    printProgress = if (status == PrintStatus.COMPLETED) 100 else it.printProgress,
                     printStatusMessage = when (status) {
-                        PrintStatus.SUCCESS -> "Printed successfully."
+                        PrintStatus.COMPLETED -> "Printed successfully."
                         PrintStatus.CANCELLED -> "Print cancelled."
                         PrintStatus.FAILED -> "Print failed."
                         PrintStatus.PENDING -> "Print pending."
                         PrintStatus.NOT_SUPPORTED -> "Printing not supported on this platform."
                         PrintStatus.NOT_STARTED -> "Not Started"
+                        PrintStatus.PRINTING -> "Printing..."
                     },
                     lastPrintStatus = status
                 )

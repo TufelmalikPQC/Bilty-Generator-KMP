@@ -1,5 +1,10 @@
+package com.bilty.generator.modules.print.ui
+
+/*
+
 package com.bilty.generator.modules.print
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.FlowRow
@@ -36,7 +41,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.bilty.generator.bridge.getPdfGenerator
 import com.bilty.generator.model.enums.PrintOrientation
 import com.bilty.generator.modules.print.components.EmptyPrinterListView
@@ -44,7 +48,6 @@ import com.bilty.generator.modules.print.components.PrinterRow
 import com.bilty.generator.uiToolKit.PrintingStatusBottomSheet
 import com.bilty.generator.uiToolKit.getDemoRoadLineDeliveryReceipt
 import com.bilty.generator.uiToolKit.getHtmlPageZoomLevel
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +61,7 @@ fun PrinterScreen(
     val viewModel = PrinterViewModel()
     val uiState by viewModel.uiState.collectAsState()
     var receiptHtmlByteArray by remember { mutableStateOf<ByteArray?>(null) }
-    var isPdfGenerating by remember { mutableStateOf(isPreviewWithImageBitmap) }
+    var isPdfGenerating by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         viewModel.updateFontSize(size = fontSize.toString())
@@ -70,29 +73,23 @@ fun PrinterScreen(
     }
 
     LaunchedEffect(Unit) {
-        // Only generate PDF if using PDF print method
-        if (isPreviewWithImageBitmap) {
-            try {
-                println("Starting PDF generation...")
-                val pdfData = getPdfGenerator().generatePdf(
-                    receipt = getDemoRoadLineDeliveryReceipt(),
-                    isPreviewWithImageBitmap = isPreviewWithImageBitmap,
-                    isWantToSavePDFLocally = true, // Save PDF to disk before printing
-                    zoomLevel = getHtmlPageZoomLevel(),
-                    fontSize = fontSize,
-                    isLandscapeMode = isLandscapeMode,
-                    fontFamilyName = fontFamilyName
-                )
-                receiptHtmlByteArray = pdfData
-                isPdfGenerating = false
-                println("PDF generation completed and saved: ${pdfData?.size ?: 0} bytes")
-            } catch (e: Exception) {
-                println("PDF generation failed in LaunchedEffect: ${e.message}")
-                e.printStackTrace()
-                isPdfGenerating = false
-            }
-        } else {
-            println("Direct text print mode - skipping PDF generation")
+        try {
+            println("Starting PDF generation...")
+            val pdfData = getPdfGenerator().generatePdf(
+                receipt = getDemoRoadLineDeliveryReceipt(),
+                isPreviewWithImageBitmap = isPreviewWithImageBitmap,
+                isWantToSavePDFLocally = false,
+                zoomLevel = getHtmlPageZoomLevel(),
+                fontSize = fontSize,
+                isLandscapeMode = isLandscapeMode,
+                fontFamilyName = fontFamilyName
+            )
+            receiptHtmlByteArray = pdfData
+            isPdfGenerating = false
+            println("PDF generation completed in LaunchedEffect: ${pdfData?.size ?: 0} bytes")
+        } catch (e: Exception) {
+            println("PDF generation failed in LaunchedEffect: ${e.message}")
+            e.printStackTrace()
             isPdfGenerating = false
         }
     }
@@ -120,22 +117,15 @@ fun PrinterScreen(
                     Button(
                         enabled = !isPdfGenerating,
                         onClick = {
-                            if (isPreviewWithImageBitmap) {
-                                // PDF Print Mode
-                                receiptHtmlByteArray?.let { pdfData ->
-                                    if (pdfData.isNotEmpty()) {
-                                        println("🖨️ Print button clicked with PDF data: ${pdfData.size} bytes")
-                                        viewModel.onPrintClicked(pdfData = pdfData)
-                                    } else {
-                                        println("❌ Print button clicked but PDF data is empty")
-                                    }
-                                } ?: run {
-                                    println("❌ Print button clicked but PDF data is null")
+                            receiptHtmlByteArray?.let { pdfData ->
+                                if (pdfData.isNotEmpty()) {
+                                    println("🖨️ Print button clicked with PDF data: ${pdfData.size} bytes")
+                                    viewModel.onPrintClicked(pdfData = pdfData)
+                                } else {
+                                    println("❌ Print button clicked but PDF data is empty")
                                 }
-                            } else {
-                                // Direct Text Print Mode
-                                println("🖨️ Print button clicked for direct text print")
-                                viewModel.onDirectTextPrintClicked()
+                            } ?: run {
+                                println("❌ Print button clicked but PDF data is null")
                             }
                         },
                         modifier = Modifier.fillMaxWidth().height(50.dp)
@@ -147,7 +137,7 @@ fun PrinterScreen(
                         } else {
                             Icon(Icons.Default.Print, contentDescription = "Print Icon")
                             Spacer(Modifier.width(8.dp))
-                            Text(if (isPreviewWithImageBitmap) "PRINT PDF" else "PRINT TEXT")
+                            Text("PRINT DOCUMENT")
                         }
                     }
                 }
@@ -195,14 +185,4 @@ fun PrinterScreen(
     }
 }
 
-@Preview
-@Composable
-fun PrinterScreenPreview() {
-    PrinterScreen(
-        navController = rememberNavController(),
-        isPreviewWithImageBitmap = true,
-        fontSize = 12,
-        isLandscapeMode = false,
-        fontFamilyName = "Roboto"
-    )
-}
+*/

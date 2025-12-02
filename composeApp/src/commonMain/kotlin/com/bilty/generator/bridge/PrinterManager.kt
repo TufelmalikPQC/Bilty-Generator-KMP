@@ -29,7 +29,11 @@ expect class PrinterManager() {
         isLandscapeMode: Boolean? = true,
         fontFamilyName: String? = "Dot Matrix"
     ): PrintStatus
-    suspend fun printBiltyText(textContent: String, printerName: String?): PrintStatus
 
-    suspend fun printBiltyTextTest(printerName: String?): PrintStatus
+    suspend fun printBiltyTextFile(
+        printerName: String?,
+        fontSize: Int?,
+        isLandscapeMode: Boolean?,
+        fontFamilyName: String?
+    ): PrintStatus
 }
