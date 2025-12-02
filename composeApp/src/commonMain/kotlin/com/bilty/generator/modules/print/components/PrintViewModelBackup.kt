@@ -1,3 +1,7 @@
+package com.bilty.generator.modules.print.components
+
+/*
+
 package com.bilty.generator.modules.print
 
 
@@ -69,51 +73,6 @@ class PrinterViewModel {
         _uiState.update { it.copy(selectedPrinterName = printerName) }
     }
 
-    fun onDirectTextPrintClicked() {
-        viewModelScope.launch {
-            val selectedPrinter = _uiState.value.selectedPrinterName
-            println("📄 Direct text print mode")
-            println("🖨️ Sending text print job to '${selectedPrinter ?: "default printer"}'...")
-
-            // Show printing bottom sheet
-            _uiState.update {
-                it.copy(
-                    isPrinting = true,
-                    printProgress = 0,
-                    printStatusMessage = "Preparing text print job...",
-                    lastPrintStatus = null
-                )
-            }
-
-            // Simulated staged progress while waiting for actual print result
-            launch { simulateProgressWhilePrinting() }
-
-            // Direct text print call
-            val status = printerManager.printBiltyTextTest(
-                selectedPrinter
-            )
-
-            // Update final state
-            _uiState.update {
-                it.copy(
-                    isPrinting = false,
-                    printProgress = if (status == PrintStatus.SUCCESS) 100 else it.printProgress,
-                    printStatusMessage = when (status) {
-                        PrintStatus.SUCCESS -> "Text printed successfully."
-                        PrintStatus.CANCELLED -> "Print cancelled."
-                        PrintStatus.FAILED -> "Print failed."
-                        PrintStatus.PENDING -> "Print pending."
-                        PrintStatus.NOT_SUPPORTED -> "Printing not supported on this platform."
-                        PrintStatus.NOT_STARTED -> "Not Started"
-                    },
-                    lastPrintStatus = status
-                )
-            }
-
-            println("✅ Text print job status: $status")
-        }
-    }
-
     fun onPrintClicked(pdfData: ByteArray) {
         viewModelScope.launch {
             val selectedPrinter = _uiState.value.selectedPrinterName
@@ -147,7 +106,7 @@ class PrinterViewModel {
             // Simulated staged progress while waiting for actual print result
             launch { simulateProgressWhilePrinting() }
 
-            // Actual print call with PDF
+            /*// Actual print call
             val status = printerManager.printPdf(
                 pdfContentData = pdfData,
                 printerName = selectedPrinter,
@@ -155,6 +114,13 @@ class PrinterViewModel {
                 isLandscapeMode = selectedOrientations.value.value == "LANDSCAPE",
                 fontFamilyName = selectedFonts.value
             )
+            */
+
+
+            val status = printerManager.printBiltyTextTest(
+                selectedPrinter
+            )
+
 
             // Update final state
             _uiState.update {
@@ -162,7 +128,7 @@ class PrinterViewModel {
                     isPrinting = false,
                     printProgress = if (status == PrintStatus.SUCCESS) 100 else it.printProgress,
                     printStatusMessage = when (status) {
-                        PrintStatus.SUCCESS -> "PDF printed successfully."
+                        PrintStatus.SUCCESS -> "Printed successfully."
                         PrintStatus.CANCELLED -> "Print cancelled."
                         PrintStatus.FAILED -> "Print failed."
                         PrintStatus.PENDING -> "Print pending."
@@ -297,3 +263,4 @@ class PrinterViewModel {
     }
 
 }
+*/

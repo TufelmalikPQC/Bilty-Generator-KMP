@@ -1,9 +1,7 @@
 package com.bilty.generator.uiToolKit
 
 import com.bilty.generator.model.constants.Constants.Fonts.FONT_FAMILY_NAME
-import com.bilty.generator.model.constants.Constants.RECEIPT_HEIGHT_POINTS
 import com.bilty.generator.model.constants.Constants.RECEIPT_IMAGE_PATH
-import com.bilty.generator.model.constants.Constants.RECEIPT_WIDTH_POINTS
 import com.bilty.generator.model.data.BiltyChargesTable
 import com.bilty.generator.model.data.RoadLineDeliveryReceipt
 
@@ -23,7 +21,6 @@ suspend fun generateRoadLineDeliveryReceipt(
     } else {
         "background-color: transparent;"
     }
-
 
     return """
         <!DOCTYPE html>
@@ -55,8 +52,8 @@ suspend fun generateRoadLineDeliveryReceipt(
                 }
                 
                 @page {
-                    size: ${if (isLandscapeMode) "landscape" else "portrait"}; /* Sets the page size to A4 in portrait orientation */
-                    margin: 0; /* Sets a 1cm margin on all sides of the page */
+                    size: 148mm 105mm; /* Always landscape: 148mm wide × 105mm tall (5.82" × 4.13") */
+                    margin: 0; /* No margins - full page printing */
                   }
                   
                   @media print {
@@ -75,11 +72,6 @@ suspend fun generateRoadLineDeliveryReceipt(
                             page-break-after: always;
                         }
                     }
-                
-                /*@page {
-                    size: ${if (isLandscapeMode) "landscape" else "portrait"};
-                    margin: 0;
-                }*/
 
                 .form-container {
                     position: relative;

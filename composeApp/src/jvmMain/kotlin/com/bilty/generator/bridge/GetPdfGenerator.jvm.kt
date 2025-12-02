@@ -10,7 +10,6 @@ import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.apache.pdfbox.pdmodel.common.PDRectangle
 import java.io.File
 import java.io.FileOutputStream
 
@@ -41,8 +40,6 @@ class PdfGeneratorDesktop : PdfGenerator {
             // 1. Generate the PDF into memory first
             val outputStream = java.io.ByteArrayOutputStream()
 
-
-
             try {
                 val fontName = getFontFamilyName(fontFamilyName)
                 val url = this::class.java.classLoader.getResource(fontName)
@@ -55,14 +52,22 @@ class PdfGeneratorDesktop : PdfGenerator {
                 PdfRendererBuilder().run {
                     useFont({ fontStream }, FONT_FAMILY_NAME)
 
-                    /*// how to se the page size
-                    val size = PDRectangle( 4.1f * 72,5.8f * 72)
-
+                    // Set exact page size for receipt: 148mm × 105mm (5.82677" × 4.13386")
+                    val (pageWidth, pageHeight) = if (isLandscapeMode) {
+                        // Landscape: 148mm wide × 105mm tall = 5.82677" × 4.13386"
+                        5.82677f to 4.13386f
+                    } else {
+                        // Portrait: 105mm wide × 148mm tall = 4.13386" × 5.82677"
+                        4.13386f to 5.82677f
+                    }
+                    
+                    println("📐 Setting PDF page size: ${pageWidth}\" × ${pageHeight}\" (${if (isLandscapeMode) "landscape" else "portrait"})")
+                    
                     useDefaultPageSize(
-                        size.width,
-                        size.height,
+                        pageWidth,
+                        pageHeight,
                         BaseRendererBuilder.PageSizeUnits.INCHES
-                    )*/
+                    )
 
                     withHtmlContent(html, null)
                     toStream(outputStream)
@@ -75,7 +80,6 @@ class PdfGeneratorDesktop : PdfGenerator {
                 e.printStackTrace()
                 return@withContext null
             }
-
 
             val pdfData = outputStream.toByteArray()
 

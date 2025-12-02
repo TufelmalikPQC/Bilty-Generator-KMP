@@ -5,6 +5,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class AppRoutes {
     @Serializable
+    data object PrintMethodSelectionScreen : AppRoutes()
+
+    @Serializable
     data object PrintPreviewScreen : AppRoutes()
 
     @Serializable

@@ -23,7 +23,7 @@ actual class PrinterManager {
     }
 
     actual suspend fun printPdf(
-        data: ByteArray,
+        pdfContentData: ByteArray,
         printerName: String?,
         fontSize: Int?,
         isLandscapeMode: Boolean?,
@@ -46,7 +46,7 @@ actual class PrinterManager {
                 callback: WriteResultCallback?
             ) {
                 try {
-                    ByteArrayInputStream(data).use { input ->
+                    ByteArrayInputStream(pdfContentData).use { input ->
                         FileOutputStream(destination?.fileDescriptor).use { output ->
                             input.copyTo(output)
                         }
@@ -76,6 +76,14 @@ actual class PrinterManager {
 
         // The job is handed off to the system. We can only assume it's pending.
         return PrintStatus.PENDING
+    }
+
+    actual suspend fun printBiltyText(textContent: String, printerName: String?): PrintStatus {
+        TODO("Not yet implemented")
+    }
+
+    actual suspend fun printBiltyTextTest(printerName: String?): PrintStatus {
+        TODO("Not yet implemented")
     }
 
 }

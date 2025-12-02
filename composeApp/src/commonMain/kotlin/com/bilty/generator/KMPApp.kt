@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.bilty.generator.modules.AppRoutes
 import com.bilty.generator.modules.preview.PrintPreviewScreen
 import com.bilty.generator.modules.print.PrinterScreen
+import com.bilty.generator.modules.printmethod.PrintMethodSelectionScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -18,8 +19,12 @@ fun KMPApp() {
     MaterialTheme {
         NavHost(
             navController = navController,
-            startDestination = AppRoutes.PrintPreviewScreen
+            startDestination = AppRoutes.PrintMethodSelectionScreen
         ) {
+            composable<AppRoutes.PrintMethodSelectionScreen> {
+                PrintMethodSelectionScreen(navController)
+            }
+
             composable<AppRoutes.PrintPreviewScreen> {
                 PrintPreviewScreen(navController)
             }

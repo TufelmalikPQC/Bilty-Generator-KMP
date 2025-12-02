@@ -29,7 +29,7 @@ actual class PrinterManager {
     }
 
     actual suspend fun printPdf(
-        data: ByteArray,
+        pdfContentData: ByteArray,
         printerName: String?,
         fontSize: Int?,
         isLandscapeMode: Boolean?,
@@ -47,7 +47,7 @@ actual class PrinterManager {
                 outputType = UIPrintInfoOutputTypeGeneral
                 jobName = "Your_App_Document"
             }
-            printController.printingItem = data.toNSData()
+            printController.printingItem = pdfContentData.toNSData()
 
             printController.presentAnimated(true) { _, completed, error ->
                 when {
@@ -61,5 +61,13 @@ actual class PrinterManager {
 
     actual suspend fun printRawText(ipAddress: String, port: Int, text: String): PrintStatus {
 
+    }
+
+    actual suspend fun printBiltyText(textContent: String, printerName: String?): PrintStatus {
+        TODO("Not yet implemented")
+    }
+
+    actual suspend fun printBiltyTextTest(printerName: String?): PrintStatus {
+        TODO("Not yet implemented")
     }
 }

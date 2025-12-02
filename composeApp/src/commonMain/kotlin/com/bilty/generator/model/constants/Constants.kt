@@ -27,8 +27,8 @@ object Constants {
 
 
     // Receipt size: 148 mm × 105 mm
-    const val receiptWidthInches = 5.0
-    const val receiptHeightInches = 3.6
+    const val receiptWidthInches = 5.82
+    const val receiptHeightInches = 4.12
 
     const val RECEIPT_WIDTH_POINTS = receiptWidthInches * 72
     const val RECEIPT_HEIGHT_POINTS = receiptHeightInches * 72

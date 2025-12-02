@@ -16,15 +16,15 @@ actual class PrinterManager {
     }
 
     actual suspend fun printPdf(
-        data: ByteArray,
+        pdfContentData: ByteArray,
         printerName: String?,
         fontSize: Int?,
         isLandscapeMode: Boolean?,
         fontFamilyName: String?
     ): PrintStatus {
         return try {
-            val int8Array = Int8Array(data.size)
-            data.forEachIndexed { index, byte ->
+            val int8Array = Int8Array(pdfContentData.size)
+            pdfContentData.forEachIndexed { index, byte ->
                 // CORRECTED: Use standard indexed assignment
                 int8Array[index] = byte
             }
@@ -40,5 +40,13 @@ actual class PrinterManager {
             println("Wasm printing failed: ${e.message}")
             PrintStatus.FAILED
         }
+    }
+
+    actual suspend fun printBiltyText(textContent: String, printerName: String?): PrintStatus {
+        TODO("Not yet implemented")
+    }
+
+    actual suspend fun printBiltyTextTest(printerName: String?): PrintStatus {
+        TODO("Not yet implemented")
     }
 }

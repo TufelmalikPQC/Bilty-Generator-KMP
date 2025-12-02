@@ -23,6 +23,16 @@ navigationCompose = "2.9.0-beta04"
 kotlinxSerializationJson = "1.9.0"
 kotlinx-serialization = "2.2.0"
 
+
+# Firebase
+firebaseCommon = "2.4.0"
+firebaseBom = "34.6.0"
+firebaseAuth = "2.4.0"
+firebaseStorage = "2.4.0"
+firebaseCrashlytics = "2.4.0"
+firebaseFirestore = "2.4.0"
+
+
 [libraries]
 javafx-web = { module = "org.openjfx:javafx-web", version.ref = "javafxWeb" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -42,6 +52,16 @@ ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
 openhtmltopdf-pdfbox = { module = "com.openhtmltopdf:openhtmltopdf-pdfbox", version.ref = "openhtmltopdfPdfbox" }
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+
+
+# Firebase
+firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebaseCommon" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebaseAuth" }
+firebase-storage = { module = "dev.gitlive:firebase-storage", version.ref = "firebaseStorage" }
+firebase-database = { module = "dev.gitlive:firebase-database", version.ref = "firebaseStorage" }
+firebase-crashlytics = { module = "dev.gitlive:firebase-crashlytics", version.ref = "firebaseCrashlytics" }
+firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebaseFirestore" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

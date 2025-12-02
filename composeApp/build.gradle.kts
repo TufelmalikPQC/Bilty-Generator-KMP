@@ -99,6 +99,7 @@ kotlin {
             implementation(libs.kotlinx.coroutinesSwing)
             // Html to PDF
             implementation(libs.openhtmltopdf.pdfbox)
+            implementation("commons-logging:commons-logging:1.2")
         }
     }
 }

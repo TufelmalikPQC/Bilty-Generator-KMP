@@ -18,16 +18,18 @@ expect class PrinterManager() {
      * Prints a PDF document from its raw data in a ByteArray.
      * This is useful for printing PDFs generated in memory.
      *
-     * @param data The ByteArray of the PDF file.
+     * @param pdfContentData The ByteArray of the PDF file.
      * @param printerName The name of a specific printer to use (Desktop only). If null, a default is used.
      * @return A [PrintStatus] indicating the outcome.
      */
     suspend fun printPdf(
-        data: ByteArray,
+        pdfContentData: ByteArray,
         printerName: String? = null,
         fontSize: Int? = 22,
         isLandscapeMode: Boolean? = true,
         fontFamilyName: String? = "Dot Matrix"
     ): PrintStatus
+    suspend fun printBiltyText(textContent: String, printerName: String?): PrintStatus
 
+    suspend fun printBiltyTextTest(printerName: String?): PrintStatus
 }
