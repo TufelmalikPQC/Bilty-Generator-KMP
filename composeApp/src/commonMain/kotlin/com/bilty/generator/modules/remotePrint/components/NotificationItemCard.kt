@@ -13,9 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,7 +32,12 @@ import com.bilty.generator.bridge.formatTimestamp
 import com.bilty.generator.model.data.NotificationItem
 
 @Composable
-fun NotificationItemCard(notification: NotificationItem) {
+fun NotificationItemCard(
+    notification: NotificationItem,
+    showApprovalButtons: Boolean = false,
+    onApprove: () -> Unit = {},
+    onReject: () -> Unit = {}
+) {
     val statusConfig = getStatusConfig(notification.status)
 
     Card(
@@ -101,6 +110,48 @@ fun NotificationItemCard(notification: NotificationItem) {
                     fontWeight = FontWeight.Medium,
                     color = statusConfig.iconColor
                 )
+            }
+
+            // Show approve/reject buttons only when auto-approve is disabled
+            if (showApprovalButtons) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Reject button
+                    IconButton(
+                        onClick = onReject,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(Color(0xFFFFEBEE), CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = "Reject",
+                            tint = Color(0xFFD32F2F),
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    // Approve button
+                    IconButton(
+                        onClick = onApprove,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(Color(0xFFE8F5E9), CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = "Approve",
+                            tint = Color(0xFF388E3C),
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
             }
         }
     }

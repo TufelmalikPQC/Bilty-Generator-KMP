@@ -13,6 +13,7 @@ plugins {
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.navigation.safeargs)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.googleServices)
 }
 
 kotlin {
@@ -93,6 +94,7 @@ kotlin {
                 implementation(project.dependencies.platform(libs.firebase.bom))
                 implementation(libs.firebase.database)
 
+
                 // add date time library
                 implementation(libs.kotlinx.datetime)
 
@@ -112,7 +114,7 @@ kotlin {
             implementation(libs.kotlinx.coroutinesSwing)
             // Html to PDF
             implementation(libs.openhtmltopdf.pdfbox)
-            implementation("commons-logging:commons-logging:1.2")
+            implementation(libs.commons.logging)
         }
     }
 }

@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,13 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Notifications
@@ -58,6 +53,7 @@ import biltygenerator.composeapp.generated.resources.title_print_request_screen
 import com.bilty.generator.model.data.NotificationItem
 import com.bilty.generator.model.enums.PrintStatus
 import com.bilty.generator.modules.remotePrint.components.BranchItem
+import com.bilty.generator.modules.remotePrint.components.CompanyBranchSelectionDialog
 import com.bilty.generator.modules.remotePrint.components.CompanyItem
 import com.bilty.generator.modules.remotePrint.components.GrMasterItem
 import com.bilty.generator.modules.remotePrint.components.NotificationDrawerContent
@@ -71,27 +67,31 @@ fun SendPrintRequestScreen(navController: NavHostController) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var showRedDot by remember { mutableStateOf(true) }
-    var autoApprove by remember { mutableStateOf(false) }
+    var autoApprove by remember { mutableStateOf(true) }
     val sendPrintRequestViewModel = SendPrintRequestViewModel()
 
     val companies by sendPrintRequestViewModel.companies.collectAsState()
     val branches by sendPrintRequestViewModel.branches.collectAsState()
     val grMasterDetailsList by sendPrintRequestViewModel.grMasterList.collectAsState()
 
-    // Selection states - default to first item
-    var selectedCompanyId by remember { mutableStateOf<Long?>(null) }
-    var selectedBranchId by remember { mutableStateOf<Long?>(null) }
-    var selectedGrId by remember { mutableStateOf<String?>(null) }
+    // Dialog and current selection state
+    var showSelectionDialog by remember { mutableStateOf(true) }
+    var currentCompanyId by remember { mutableStateOf(companies[0].id) }
+    var currentBranchId by remember { mutableStateOf(branches[0].id) }
 
-    // Set default selections to first item when data loads
-    if (selectedCompanyId == null && companies.isNotEmpty()) {
-        selectedCompanyId = companies.firstOrNull()?.id
-    }
-    if (selectedBranchId == null && branches.isNotEmpty()) {
-        selectedBranchId = branches.firstOrNull()?.id
-    }
+    // Selection states for GR - default to first item
+    var selectedGrId by remember { mutableStateOf(grMasterDetailsList[0].id) }
+
+    // Set default selection for GR when data loads
     if (selectedGrId == null && grMasterDetailsList.isNotEmpty()) {
         selectedGrId = grMasterDetailsList.firstOrNull()?.grInfoId
+    }
+
+    // Show dialog if company/branch not selected and data is available
+    if (currentCompanyId == null && currentBranchId == null &&
+        companies.isNotEmpty() && branches.isNotEmpty()
+    ) {
+        showSelectionDialog = true
     }
 
 
@@ -103,6 +103,19 @@ fun SendPrintRequestScreen(navController: NavHostController) {
             NotificationItem("PQR Movers", "GR#12343", 1710417600000L, PrintStatus.FAILED),
             NotificationItem("LMN Carriers", "GR#12342", 1710331200000L, PrintStatus.PRINTING),
             NotificationItem("DEF Transport", "GR#12341", 1710244800000L, PrintStatus.COMPLETED),
+        )
+    }
+
+    // Show selection dialog
+    if (showSelectionDialog && companies.isNotEmpty() && branches.isNotEmpty()) {
+        CompanyBranchSelectionDialog(
+            companies = companies,
+            branches = branches,
+            onConfirm = { companyId, branchId ->
+                currentCompanyId = companyId
+                currentBranchId = branchId
+                showSelectionDialog = false
+            }
         )
     }
 
@@ -197,101 +210,242 @@ fun SendPrintRequestScreen(navController: NavHostController) {
                         }
                     },
                     content = {
-                        Column(
+                        Box(
                             modifier = Modifier
                                 .padding(it)
                                 .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
                         ) {
-                            Text(
-                                text = "Select Company, Branch and GR Details for printing",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(16.dp)
-                            )
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            FlowRow(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize()
                             ) {
-                                Card(
-                                    modifier = Modifier
-                                        .widthIn(min = 300.dp, max = 500.dp)
+                                // Current Selection Display
+                                item {
+                                    if (currentCompanyId != null && currentBranchId != null) {
+                                        Card(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                            colors = androidx.compose.material3.CardDefaults.cardColors(
+                                                containerColor = ThemeColors.printRequestPrimaryColor.copy(alpha = 0.15f)
+                                            )
+                                        ) {
+                                            Column(
+                                                modifier = Modifier.padding(20.dp)
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Text(
+                                                        text = "Current Selection",
+                                                        fontSize = 22.sp,
+                                                        fontWeight = FontWeight.Bold,
+                                                        color = ThemeColors.printRequestPrimaryColor
+                                                    )
 
-                                        .padding(8.dp)
-                                ) {
+                                                    Button(
+                                                        onClick = { showSelectionDialog = true },
+                                                        colors = ButtonDefaults.buttonColors(
+                                                            containerColor = ThemeColors.printRequestPrimaryColor
+                                                        )
+                                                    ) {
+                                                        Text("Change")
+                                                    }
+                                                }
+
+                                                Spacer(modifier = Modifier.height(16.dp))
+
+                                                // Current Company
+                                                val currentCompany = companies.find { it.id == currentCompanyId }
+                                                if (currentCompany != null) {
+                                                    Card(
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        colors = androidx.compose.material3.CardDefaults.cardColors(
+                                                            containerColor = Color.White
+                                                        )
+                                                    ) {
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .padding(16.dp),
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Column(modifier = Modifier.weight(1f)) {
+                                                                Text(
+                                                                    text = "Company",
+                                                                    fontSize = 12.sp,
+                                                                    color = Color.Gray,
+                                                                    fontWeight = FontWeight.Medium
+                                                                )
+                                                                Spacer(modifier = Modifier.height(4.dp))
+                                                                Text(
+                                                                    text = currentCompany.companyName.orEmpty(),
+                                                                    fontSize = 18.sp,
+                                                                    fontWeight = FontWeight.Bold,
+                                                                    color = ThemeColors.printRequestPrimaryColor
+                                                                )
+                                                                if (!currentCompany.adminId.isNullOrEmpty()) {
+                                                                    Text(
+                                                                        text = "Admin: ${currentCompany.adminId}",
+                                                                        fontSize = 13.sp,
+                                                                        color = Color.DarkGray
+                                                                    )
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                Spacer(modifier = Modifier.height(12.dp))
+
+                                                // Current Branch
+                                                val currentBranch = branches.find { it.id == currentBranchId }
+                                                if (currentBranch != null) {
+                                                    Card(
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        colors = androidx.compose.material3.CardDefaults.cardColors(
+                                                            containerColor = Color.White
+                                                        )
+                                                    ) {
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .padding(16.dp),
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Column(modifier = Modifier.weight(1f)) {
+                                                                Text(
+                                                                    text = "Branch",
+                                                                    fontSize = 12.sp,
+                                                                    color = Color.Gray,
+                                                                    fontWeight = FontWeight.Medium
+                                                                )
+                                                                Spacer(modifier = Modifier.height(4.dp))
+                                                                Text(
+                                                                    text = currentBranch.branchName.orEmpty(),
+                                                                    fontSize = 18.sp,
+                                                                    fontWeight = FontWeight.Bold,
+                                                                    color = ThemeColors.printRequestPrimaryColor
+                                                                )
+                                                                if (!currentBranch.branchCode.isNullOrEmpty()) {
+                                                                    Text(
+                                                                        text = "Code: ${currentBranch.branchCode}",
+                                                                        fontSize = 13.sp,
+                                                                        color = Color.DarkGray
+                                                                    )
+                                                                }
+                                                                if (currentBranch.isActive) {
+                                                                    Text(
+                                                                        text = "● Active",
+                                                                        fontSize = 12.sp,
+                                                                        color = Color(0xFF388E3C)
+                                                                    )
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
+                                }
+
+                                item {
                                     Text(
-                                        text = "Select Company Details",
-                                        fontSize = 18.sp,
+                                        text = "Select Company, Branch and GR Details for printing",
+                                        fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(16.dp)
                                     )
 
-                                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                                        items(companies) { company ->
-                                            CompanyItem(
-                                                company = company,
-                                                isSelected = company.id == selectedCompanyId,
-                                                onSelected = { selectedCompanyId = company.id }
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                }
+
+                                // Company Selection Card
+                                item {
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    ) {
+                                        Column {
+                                            Text(
+                                                text = "Select Company Details",
+                                                fontSize = 18.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier.padding(16.dp)
                                             )
+
+                                            companies.forEach { company ->
+                                                CompanyItem(
+                                                    company = company,
+                                                    isSelected = company.id == currentCompanyId,
+                                                    onSelected = { currentCompanyId = company.id }
+                                                )
+                                            }
                                         }
                                     }
                                 }
 
-
-                                Card(
-                                    modifier = Modifier
-                                        .widthIn(min = 300.dp, max = 500.dp)
-                                        .padding(8.dp)
-                                ) {
-                                    Text(
-                                        text = "Select Branch Details",
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(16.dp)
-                                    )
-
-                                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                                        items(branches) { branch ->
-                                            BranchItem(
-                                                branch = branch,
-                                                isSelected = branch.id == selectedBranchId,
-                                                onSelected = { selectedBranchId = branch.id }
+                                // Branch Selection Card
+                                item {
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    ) {
+                                        Column {
+                                            Text(
+                                                text = "Select Branch Details",
+                                                fontSize = 18.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier.padding(16.dp)
                                             )
+
+                                            branches.forEach { branch ->
+                                                BranchItem(
+                                                    branch = branch,
+                                                    isSelected = branch.id == currentBranchId,
+                                                    onSelected = { currentBranchId = branch.id }
+                                                )
+                                            }
                                         }
                                     }
                                 }
 
-
-                                Card(
-                                    modifier = Modifier
-                                        .widthIn(min = 300.dp, max = 500.dp)
-                                        .padding(8.dp)
-                                ) {
-                                    Text(
-                                        text = "Select GR Details",
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(16.dp)
-                                    )
-
-                                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                                        items(grMasterDetailsList) { grData ->
-                                            GrMasterItem(
-                                                gr = grData,
-                                                isSelected = grData.grInfoId == selectedGrId,
-                                                onSelected = { selectedGrId = grData.grInfoId }
+                                // GR Selection Card
+                                item {
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    ) {
+                                        Column {
+                                            Text(
+                                                text = "Select GR Details",
+                                                fontSize = 18.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier.padding(16.dp)
                                             )
+
+                                            grMasterDetailsList.forEach { grData ->
+                                                GrMasterItem(
+                                                    gr = grData,
+                                                    isSelected = grData.grInfoId == selectedGrId,
+                                                    onSelected = { selectedGrId = grData.grInfoId }
+                                                )
+                                            }
                                         }
                                     }
+                                }
+
+                                item {
+                                    Spacer(modifier = Modifier.height(80.dp))
                                 }
                             }
-
                         }
                     }
                 )
