@@ -122,7 +122,6 @@ kotlin {
             implementation(libs.commons.logging)
 
             implementation(libs.firebase.admin)
-            implementation(libs.firebase.java.sdk)
         }
     }
 }
