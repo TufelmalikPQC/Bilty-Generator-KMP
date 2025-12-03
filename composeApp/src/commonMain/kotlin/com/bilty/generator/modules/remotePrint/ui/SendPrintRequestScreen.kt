@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -19,8 +18,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Notifications
@@ -70,12 +71,28 @@ fun SendPrintRequestScreen(navController: NavHostController) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var showRedDot by remember { mutableStateOf(true) }
-    var autoApprove by remember { mutableStateOf(true) }
+    var autoApprove by remember { mutableStateOf(false) }
     val sendPrintRequestViewModel = SendPrintRequestViewModel()
 
     val companies by sendPrintRequestViewModel.companies.collectAsState()
     val branches by sendPrintRequestViewModel.branches.collectAsState()
     val grMasterDetailsList by sendPrintRequestViewModel.grMasterList.collectAsState()
+
+    // Selection states - default to first item
+    var selectedCompanyId by remember { mutableStateOf<Long?>(null) }
+    var selectedBranchId by remember { mutableStateOf<Long?>(null) }
+    var selectedGrId by remember { mutableStateOf<String?>(null) }
+
+    // Set default selections to first item when data loads
+    if (selectedCompanyId == null && companies.isNotEmpty()) {
+        selectedCompanyId = companies.firstOrNull()?.id
+    }
+    if (selectedBranchId == null && branches.isNotEmpty()) {
+        selectedBranchId = branches.firstOrNull()?.id
+    }
+    if (selectedGrId == null && grMasterDetailsList.isNotEmpty()) {
+        selectedGrId = grMasterDetailsList.firstOrNull()?.grInfoId
+    }
 
 
     // Sample notification data
@@ -181,17 +198,19 @@ fun SendPrintRequestScreen(navController: NavHostController) {
                     },
                     content = {
                         Column(
-                            modifier = Modifier.padding(it)
+                            modifier = Modifier
+                                .padding(it)
                                 .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
                         ) {
                             Text(
-                                text = "Select Company, Branch and GR Details for printing.. ",
-                                fontSize = 16.sp,
+                                text = "Select Company, Branch and GR Details for printing",
+                                fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(16.dp)
                             )
 
-                            Spacer(modifier = Modifier.height(20.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
 
                             FlowRow(
                                 modifier = Modifier
@@ -215,7 +234,11 @@ fun SendPrintRequestScreen(navController: NavHostController) {
 
                                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
                                         items(companies) { company ->
-                                            CompanyItem(company = company)
+                                            CompanyItem(
+                                                company = company,
+                                                isSelected = company.id == selectedCompanyId,
+                                                onSelected = { selectedCompanyId = company.id }
+                                            )
                                         }
                                     }
                                 }
@@ -235,7 +258,11 @@ fun SendPrintRequestScreen(navController: NavHostController) {
 
                                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
                                         items(branches) { branch ->
-                                            BranchItem(branch = branch)
+                                            BranchItem(
+                                                branch = branch,
+                                                isSelected = branch.id == selectedBranchId,
+                                                onSelected = { selectedBranchId = branch.id }
+                                            )
                                         }
                                     }
                                 }
@@ -255,7 +282,11 @@ fun SendPrintRequestScreen(navController: NavHostController) {
 
                                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
                                         items(grMasterDetailsList) { grData ->
-                                            GrMasterItem(gr = grData)
+                                            GrMasterItem(
+                                                gr = grData,
+                                                isSelected = grData.grInfoId == selectedGrId,
+                                                onSelected = { selectedGrId = grData.grInfoId }
+                                            )
                                         }
                                     }
                                 }

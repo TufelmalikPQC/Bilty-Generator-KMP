@@ -1,6 +1,7 @@
 package com.bilty.generator.modules.remotePrint.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,16 +24,26 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.bilty.generator.model.data.Company
+import com.bilty.generator.theme.ThemeColors
 import io.ktor.util.date.getTimeMillis
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun CompanyItem(company: Company) {
+fun CompanyItem(
+    company: Company,
+    isSelected: Boolean = false,
+    onSelected: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(12.dp)
-            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
+            .background(
+                if (isSelected) ThemeColors.printRequestPrimaryColor.copy(alpha = 0.1f)
+                else MaterialTheme.colorScheme.surface,
+                RoundedCornerShape(8.dp)
+            )
+            .clickable { onSelected() }
             .padding(14.dp)
     ) {
 

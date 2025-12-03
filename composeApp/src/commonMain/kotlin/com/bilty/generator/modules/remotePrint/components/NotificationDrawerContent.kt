@@ -103,7 +103,18 @@ fun NotificationDrawerContent(
             modifier = Modifier.fillMaxSize()
         ) {
             items(notifications) { notification ->
-                NotificationItemCard(notification)
+                NotificationItemCard(
+                    notification = notification,
+                    showApprovalButtons = !autoApprove,
+                    onApprove = {
+                        // Handle approve action
+                        println("Approved: ${notification.grNo}")
+                    },
+                    onReject = {
+                        // Handle reject action
+                        println("Rejected: ${notification.grNo}")
+                    }
+                )
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     color = Color.LightGray

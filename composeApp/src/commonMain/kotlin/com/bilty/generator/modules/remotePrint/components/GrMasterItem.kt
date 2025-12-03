@@ -26,17 +26,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bilty.generator.model.data.GrMaster
+import com.bilty.generator.theme.ThemeColors
 
 
 @Composable
-fun GrMasterItem(gr: GrMaster) {
+fun GrMasterItem(
+    gr: GrMaster,
+    isSelected: Boolean = false,
+    onSelected: () -> Unit = {}
+) {
     var expanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(12.dp)
-            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
+            .background(
+                if (isSelected) ThemeColors.printRequestPrimaryColor.copy(alpha = 0.1f)
+                else MaterialTheme.colorScheme.surface,
+                RoundedCornerShape(8.dp)
+            )
+            .clickable { onSelected() }
             .padding(14.dp)
     ) {
 
