@@ -123,6 +123,9 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
                 )
             }
             println("🔔 UI: Red dot shown")
+        }else{
+            showRedDot = false
+            println("🔔 UI: No new print requests, red dot hidden")
         }
     }
 
