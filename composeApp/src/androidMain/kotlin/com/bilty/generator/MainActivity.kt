@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.bilty.generator.bridge.initializeFirebase
 import com.bilty.generator.utiles.initializeApplicationContext
 import com.bilty.generator.utiles.setCurrentActivity
 
@@ -15,10 +14,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         initializeApplicationContext(this)
-
-        // Initialize Firebase before creating UI
-        initializeFirebase()
-
+        com.google.firebase.FirebaseApp.initializeApp(this)
         setContent {
             KMPApp()
         }
