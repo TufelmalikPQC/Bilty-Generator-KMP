@@ -302,7 +302,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
                     content = {
                         Box(
                             modifier = Modifier
-                                .padding(paddingValues)
+                                .padding(it)
                                 .fillMaxSize()
                         ) {
                             LazyColumn(
