@@ -4,6 +4,7 @@ import biltygenerator.composeapp.generated.resources.Res
 import biltygenerator.composeapp.generated.resources.pqc_logo
 
 object Constants {
+    const val DATE_FORMAT = "dd-MM-yyyy"
     const val RECEIPT_IMAGE_PATH = "transport_road_line_invoice.jpeg"
     const val BILTY_TEXT_FILE_PATH = "files/new_pqc_epson_lx.txt"
 

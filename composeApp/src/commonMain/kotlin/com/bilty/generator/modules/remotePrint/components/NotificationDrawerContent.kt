@@ -3,6 +3,7 @@ package com.bilty.generator.modules.remotePrint.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,8 +37,15 @@ fun NotificationDrawerContent(
     notifications: List<NotificationItem>,
     autoApprove: Boolean,
     onAutoApproveChange: (Boolean) -> Unit,
+    onApprove: (String) -> Unit,
+    onReject: (String) -> Unit,
     onClose: () -> Unit
 ) {
+    println("📋 NotificationDrawerContent: Composing with ${notifications.size} notifications")
+    notifications.forEachIndexed { index, item ->
+        println("📋 NotificationDrawerContent: [$index] GR=${item.grNo}, Company=${item.companyName}, Status=${item.status}")
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -99,26 +107,45 @@ fun NotificationDrawerContent(
         )
 
         // Notifications List
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(notifications) { notification ->
-                NotificationItemCard(
-                    notification = notification,
-                    showApprovalButtons = !autoApprove,
-                    onApprove = {
-                        // Handle approve action
-                        println("Approved: ${notification.grNo}")
-                    },
-                    onReject = {
-                        // Handle reject action
-                        println("Rejected: ${notification.grNo}")
-                    }
+        if (notifications.isEmpty()) {
+            println("📋 NotificationDrawerContent: Rendering EMPTY state")
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No new print requests",
+                    fontSize = 16.sp,
+                    color = Color.Gray
                 )
-                HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    color = Color.LightGray
-                )
+            }
+        } else {
+            println("📋 NotificationDrawerContent: Rendering LazyColumn with ${notifications.size} items")
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(
+                    items = notifications,
+                    key = { it.grNo }
+                ) { notification ->
+                    println("📋 NotificationDrawerContent: Rendering item GR=${notification.grNo}")
+                    NotificationItemCard(
+                        notification = notification,
+                        showApprovalButtons = !autoApprove,
+                        onApprove = {
+                            println("✅ NotificationDrawerContent: Approve clicked for GR=${notification.grNo}")
+                            onApprove(notification.grNo)
+                        },
+                        onReject = {
+                            println("❌ NotificationDrawerContent: Reject clicked for GR=${notification.grNo}")
+                            onReject(notification.grNo)
+                        }
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = Color.LightGray
+                    )
+                }
             }
         }
     }

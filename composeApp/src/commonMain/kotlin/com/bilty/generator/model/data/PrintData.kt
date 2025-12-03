@@ -12,5 +12,4 @@ data class PrintRequest(
     val companyId: String = "",
     val branchId: String = "",
     val grMasterId: String = "",
-    val userId: String = ""
 )

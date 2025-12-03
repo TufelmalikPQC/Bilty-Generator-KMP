@@ -1,6 +1,7 @@
 package com.bilty.generator
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,40 +17,42 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 fun KMPApp() {
     val navController = rememberNavController()
-
+    
     MaterialTheme {
-        NavHost(
-            navController = navController,
-            startDestination = AppRoutes.SendPrintRequestScreen
-        ) {
-            composable<AppRoutes.PrintMethodSelectionScreen> {
-                PrintMethodSelectionScreen(navController)
-            }
-
-            composable<AppRoutes.PrintPreviewScreen> {
-                PrintPreviewScreen(navController)
-            }
-
-            composable<AppRoutes.PrinterScreen> { route ->
-                route.savedStateHandle.apply {
-                    val isPreviewWithImageBitmap = get<Boolean>("isPreviewWithImageBitmap") ?: false
-                    val fontSize = get<Int>("fontSize") ?: 24
-                    val isLandscapeMode = get<Boolean>("isLandscapeMode") ?: false
-                    val fontFamilyName = get<String>("fontFamilyName") ?: "Dot Matrix"
-
-                    PrinterScreen(
-                        navController = navController,
-                        isPreviewWithImageBitmap = isPreviewWithImageBitmap,
-                        fontSize = fontSize,
-                        isLandscapeMode = isLandscapeMode,
-                        fontFamilyName = fontFamilyName
-                    )
+        Scaffold {paddingValues ->
+            NavHost(
+                navController = navController,
+                startDestination = AppRoutes.SendPrintRequestScreen
+            ) {
+                composable<AppRoutes.PrintMethodSelectionScreen> {
+                    PrintMethodSelectionScreen(navController)
                 }
-            }
+
+                composable<AppRoutes.PrintPreviewScreen> {
+                    PrintPreviewScreen(navController)
+                }
+
+                composable<AppRoutes.PrinterScreen> { route ->
+                    route.savedStateHandle.apply {
+                        val isPreviewWithImageBitmap = get<Boolean>("isPreviewWithImageBitmap") ?: false
+                        val fontSize = get<Int>("fontSize") ?: 24
+                        val isLandscapeMode = get<Boolean>("isLandscapeMode") ?: false
+                        val fontFamilyName = get<String>("fontFamilyName") ?: "Dot Matrix"
+
+                        PrinterScreen(
+                            navController = navController,
+                            isPreviewWithImageBitmap = isPreviewWithImageBitmap,
+                            fontSize = fontSize,
+                            isLandscapeMode = isLandscapeMode,
+                            fontFamilyName = fontFamilyName
+                        )
+                    }
+                }
 
 
-            composable<AppRoutes.SendPrintRequestScreen> {
-                SendPrintRequestScreen(navController)
+                composable<AppRoutes.SendPrintRequestScreen> {
+                    SendPrintRequestScreen(paddingValues)
+                }
             }
         }
     }

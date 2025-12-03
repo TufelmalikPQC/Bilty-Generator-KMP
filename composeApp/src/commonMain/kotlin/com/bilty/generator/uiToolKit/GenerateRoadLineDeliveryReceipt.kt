@@ -127,11 +127,11 @@ fun getDemoRoadLineDeliveryReceipt(): RoadLineDeliveryReceipt {
     return RoadLineDeliveryReceipt(
         receiptNumber = "12345678",
         branchName = "Central Warehouse",
-        date = "14/08/2025",
+        date = "14-08-2025", // Format: dd-MM-yyyy
         consignee = "XYZ Traders Pvt. Ltd., Mumbai",
         consignor = "ABC Industries Ltd., Delhi",
         biltyNumber = "BILTY-7890",
-        biltyDate = "13/08/2025",
+        biltyDate = "13-08-2025", // Format: dd-MM-yyyy
         fromLocation = "New Delhi",
         packageCount = 10,
         particulars = "Electronic Components",

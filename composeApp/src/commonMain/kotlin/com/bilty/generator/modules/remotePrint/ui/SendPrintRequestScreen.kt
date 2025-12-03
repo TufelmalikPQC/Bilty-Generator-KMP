@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -24,15 +25,19 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,12 +52,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import biltygenerator.composeapp.generated.resources.Res
 import biltygenerator.composeapp.generated.resources.title_print_request_screen
-import com.bilty.generator.model.data.NotificationItem
-import com.bilty.generator.model.enums.PrintStatus
+import com.bilty.generator.model.data.PrintRequest
+import com.bilty.generator.model.data.PrintRequestData
+import com.bilty.generator.model.data.ReceiptCharges
+import com.bilty.generator.model.enums.Printers
 import com.bilty.generator.modules.remotePrint.components.BranchItem
 import com.bilty.generator.modules.remotePrint.components.CompanyBranchSelectionDialog
 import com.bilty.generator.modules.remotePrint.components.CompanyItem
@@ -64,21 +69,29 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun SendPrintRequestScreen(navController: NavHostController) {
+fun SendPrintRequestScreen(paddingValues: PaddingValues) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    var showRedDot by remember { mutableStateOf(true) }
+    val snackbarHostState = remember { SnackbarHostState() }
     var autoApprove by remember { mutableStateOf(true) }
-    val sendPrintRequestViewModel = SendPrintRequestViewModel()
+    val viewModel = remember { SendPrintRequestViewModel() }
 
-    val companies by sendPrintRequestViewModel.companies.collectAsState()
-    val branches by sendPrintRequestViewModel.branches.collectAsState()
-    val grMasterDetailsList by sendPrintRequestViewModel.grMasterList.collectAsState()
+    println("🎬 SendPrintRequestScreen: Composing screen")
+
+    val newPrintRequests by viewModel.observedPrintRequests.collectAsState()
+    val companies by viewModel.companies.collectAsState()
+    val branches by viewModel.branches.collectAsState()
+    val grMasterDetailsList by viewModel.grMasterList.collectAsState()
+    val sendPrintStatusCode by viewModel.sendPrintStatusCode.collectAsState()
+    var showRedDot by remember { mutableStateOf(false) }
 
     // Dialog and current selection state
     var showSelectionDialog by remember { mutableStateOf(true) }
-    var currentCompanyId by remember { mutableStateOf(companies[0].id) }
-    var currentBranchId by remember { mutableStateOf(branches[0].id) }
+    var userCompanyId by remember { mutableStateOf(companies[0].id) }
+    var userBranchId by remember { mutableStateOf(branches[0].id) }
+
+    var selectedCompanyId by remember { mutableStateOf(companies[0].id) }
+    var selectedBranchId by remember { mutableStateOf(branches[0].id) }
 
     // Selection states for GR - default to first item
     var selectedGrId by remember { mutableStateOf(grMasterDetailsList[0].id.toString()) }
@@ -89,22 +102,28 @@ fun SendPrintRequestScreen(navController: NavHostController) {
     }
 
     // Show dialog if company/branch not selected and data is available
-    if (currentCompanyId == null && currentBranchId == null &&
+    if (userCompanyId == null && userBranchId == null &&
         companies.isNotEmpty() && branches.isNotEmpty()
     ) {
         showSelectionDialog = true
     }
 
 
-    // Sample notification data
-    val notifications = remember {
-        mutableListOf(
-            NotificationItem("ABC Transport Co.", "GR#12345", 1710590400000L, PrintStatus.PENDING),
-            NotificationItem("XYZ Logistics", "GR#12344", 1710504000000L, PrintStatus.COMPLETED),
-            NotificationItem("PQR Movers", "GR#12343", 1710417600000L, PrintStatus.FAILED),
-            NotificationItem("LMN Carriers", "GR#12342", 1710331200000L, PrintStatus.PRINTING),
-            NotificationItem("DEF Transport", "GR#12341", 1710244800000L, PrintStatus.COMPLETED),
-        )
+    // Update showRedDot when newPrintRequests changes
+    LaunchedEffect(newPrintRequests.size) {
+        println("🔔 UI: newPrintRequests changed - size=${newPrintRequests.size}, items=${newPrintRequests.map { it.grNo }}")
+        if (newPrintRequests.isNotEmpty()) {
+            showRedDot = true
+            if (autoApprove) {
+                viewModel.approvePrintRequest(
+                    companyId = userCompanyId.toString(),
+                    branchId = userBranchId.toString(),
+                    grNumber = newPrintRequests.firstOrNull()?.grNo.orEmpty(),
+                    statusCode = 200
+                )
+            }
+            println("🔔 UI: Red dot shown")
+        }
     }
 
     // Show selection dialog
@@ -113,9 +132,13 @@ fun SendPrintRequestScreen(navController: NavHostController) {
             companies = companies,
             branches = branches,
             onConfirm = { companyId, branchId ->
-                currentCompanyId = companyId
-                currentBranchId = branchId
+                userCompanyId = companyId
+                userBranchId = branchId
                 showSelectionDialog = false
+                viewModel.startObserving(
+                    companyId = userCompanyId.toString(),
+                    branchId = userBranchId.toString()
+                )
             }
         )
     }
@@ -131,9 +154,33 @@ fun SendPrintRequestScreen(navController: NavHostController) {
                         drawerShape = RoundedCornerShape(0.dp),
                     ) {
                         NotificationDrawerContent(
-                            notifications = notifications,
+                            notifications = newPrintRequests.also {
+                                println("🎨 UI: Rendering NotificationDrawerContent with ${it.size} notifications")
+                                println("🎨 UI: Notifications = ${it.map { n -> n.grNo }}")
+                            },
                             autoApprove = autoApprove,
-                            onAutoApproveChange = { autoApprove = it },
+                            onAutoApproveChange = {
+                                autoApprove = it
+                            },
+                            onApprove = { grNumber ->
+                                println("✅ UI: Approve button clicked for GR=$grNumber")
+                                viewModel.approvePrintRequest(
+                                    companyId = userCompanyId.toString(),
+                                    branchId = userBranchId.toString(),
+                                    grNumber = grNumber,
+                                    statusCode = 200
+                                )
+                            },
+                            onReject = { grNumber ->
+                                println("❌ UI: Reject button clicked for GR=$grNumber")
+                                viewModel.rejectPrintRequest(
+                                    companyId = userCompanyId.toString(),
+                                    branchId = userBranchId.toString(),
+                                    grNumber = grNumber,
+                                    code = 400,
+                                    message = "Print request rejected by user"
+                                )
+                            },
                             onClose = {
                                 scope.launch {
                                     drawerState.close()
@@ -148,7 +195,7 @@ fun SendPrintRequestScreen(navController: NavHostController) {
                 Scaffold(
                     topBar = {
                         Row(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.padding(paddingValues).fillMaxWidth()
                                 .background(ThemeColors.printRequestPrimaryColor)
                                 .padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -196,7 +243,43 @@ fun SendPrintRequestScreen(navController: NavHostController) {
                             ),
                             modifier = Modifier,
                             onClick = {
+                                val printRequestData = PrintRequestData(
+                                    receiptNumber = "RCPT-10245",
+                                    branchName = "Main Branch",
+                                    receiptDate = 1735873200000, // random timestamp
+                                    consignorName = "Shree Traders",
+                                    consigneeName = "Metro Distributors",
+                                    biltyNo = "BLTY-55921",
+                                    biltyDate = 1735786800000, // random timestamp
+                                    fromLocation = "Ahmedabad",
+                                    pkgs = 12,
+                                    particulars = "Electronic Accessories",
+                                    signature = "Authorized Sign",
+                                    pMarka = "FRAGILE",
+                                    receiptCharges = ReceiptCharges(
+                                        freight = 850.0,
+                                        charity = 10.0,
+                                        handling = 50.0,
+                                        delivery = 120.0,
+                                        ddCharge = 0.0,
+                                        demurrage = 0.0,
+                                        otherCost = 25.0,
+                                        grandTotal = 1055.0
+                                    )
+                                )
 
+                                viewModel.sendPrintRequest(
+                                    companyId = selectedCompanyId.toString(),
+                                    branchId = selectedBranchId.toString(),
+                                    grNumber = selectedGrId,
+                                    printRequest = PrintRequest(
+                                        companyId = selectedCompanyId.toString(),
+                                        branchId = selectedBranchId.toString(),
+                                        grMasterId = selectedGrId,
+                                        printerFormat = Printers.DOT_MATRIX,
+                                        printData = printRequestData
+                                    )
+                                )
                             }
                         ) {
                             Icon(
@@ -210,10 +293,13 @@ fun SendPrintRequestScreen(navController: NavHostController) {
                             Text(text = "New Print Request")
                         }
                     },
+                    snackbarHost = {
+                        SnackbarHost(hostState = snackbarHostState)
+                    },
                     content = {
                         Box(
                             modifier = Modifier
-                                .padding(it)
+                                .padding(paddingValues)
                                 .fillMaxSize()
                         ) {
                             LazyColumn(
@@ -221,12 +307,12 @@ fun SendPrintRequestScreen(navController: NavHostController) {
                             ) {
                                 // Current Selection Display
                                 item {
-                                    if (currentCompanyId != null && currentBranchId != null) {
+                                    if (userCompanyId != null && userBranchId != null) {
                                         Card(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(16.dp),
-                                            colors = androidx.compose.material3.CardDefaults.cardColors(
+                                            colors = CardDefaults.cardColors(
                                                 containerColor = ThemeColors.printRequestPrimaryColor.copy(
                                                     alpha = 0.15f
                                                 )
@@ -261,11 +347,11 @@ fun SendPrintRequestScreen(navController: NavHostController) {
 
                                                 // Current Company
                                                 val currentCompany =
-                                                    companies.find { it.id == currentCompanyId }
+                                                    companies.find { company -> company.id == userCompanyId }
                                                 if (currentCompany != null) {
                                                     Card(
                                                         modifier = Modifier.fillMaxWidth(),
-                                                        colors = androidx.compose.material3.CardDefaults.cardColors(
+                                                        colors = CardDefaults.cardColors(
                                                             containerColor = Color.White
                                                         )
                                                     ) {
@@ -305,11 +391,12 @@ fun SendPrintRequestScreen(navController: NavHostController) {
 
                                                 // Current Branch
                                                 val currentBranch =
-                                                    branches.find { it.id == currentBranchId }
+                                                    branches.find { branch -> branch.id == userBranchId }
                                                 if (currentBranch != null) {
                                                     Card(
-                                                        modifier = Modifier.fillMaxWidth(),
-                                                        colors = androidx.compose.material3.CardDefaults.cardColors(
+                                                        modifier = Modifier.fillMaxWidth()
+                                                            .padding(top = 10.dp),
+                                                        colors = CardDefaults.cardColors(
                                                             containerColor = Color.White
                                                         )
                                                     ) {
@@ -387,8 +474,8 @@ fun SendPrintRequestScreen(navController: NavHostController) {
                                             companies.forEach { company ->
                                                 CompanyItem(
                                                     company = company,
-                                                    isSelected = company.id == currentCompanyId,
-                                                    onSelected = { currentCompanyId = company.id }
+                                                    isSelected = company.id == selectedCompanyId,
+                                                    onSelected = { selectedCompanyId = company.id }
                                                 )
                                             }
                                         }
@@ -413,8 +500,8 @@ fun SendPrintRequestScreen(navController: NavHostController) {
                                             branches.forEach { branch ->
                                                 BranchItem(
                                                     branch = branch,
-                                                    isSelected = branch.id == currentBranchId,
-                                                    onSelected = { currentBranchId = branch.id }
+                                                    isSelected = branch.id == selectedBranchId,
+                                                    onSelected = { selectedBranchId = branch.id }
                                                 )
                                             }
                                         }
@@ -464,5 +551,5 @@ fun SendPrintRequestScreen(navController: NavHostController) {
 @Preview
 @Composable
 fun SendPrintRequestScreenPreview() {
-    SendPrintRequestScreen(rememberNavController())
+    SendPrintRequestScreen(PaddingValues())
 }

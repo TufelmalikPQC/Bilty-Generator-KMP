@@ -1,19 +1,38 @@
 package com.bilty.generator.modules.remotePrint.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.bilty.generator.model.data.Branch
 import com.bilty.generator.model.data.Company
 import com.bilty.generator.model.data.GrMaster
+import com.bilty.generator.model.data.NotificationItem
+import com.bilty.generator.model.data.PrintRequest
+import com.bilty.generator.model.data.SendPrintResponseStatus
+import com.bilty.generator.model.enums.PrintRequestResponseStatus
 import com.bilty.generator.model.enums.RateTypeEnum
+import com.bilty.generator.model.reponse.PrintRequestResponse
+import com.bilty.generator.utils.extention.toNotificationItems
+import com.bilty.generator.utils.helpers.FirebaseRemotePrintHelper
 import io.ktor.util.date.getTimeMillis
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class SendPrintRequestViewModel : ViewModel() {
+
+    // Firebase Helper
+    private val firebasePrintHelper = FirebaseRemotePrintHelper()
+    lateinit var approvePrintRequestJob: Job
+    lateinit var rejectPrintRequestJob: Job
+
 
     private var _companies: MutableStateFlow<List<Company>> = MutableStateFlow(emptyList())
     val companies: StateFlow<List<Company>> = _companies.asStateFlow()
@@ -21,9 +40,24 @@ class SendPrintRequestViewModel : ViewModel() {
     private var _branches: MutableStateFlow<List<Branch>> = MutableStateFlow(listOf())
     val branches: StateFlow<List<Branch>> = _branches.asStateFlow()
 
-
     private var _grMasterList: MutableStateFlow<List<GrMaster>> = MutableStateFlow(listOf())
     val grMasterList: StateFlow<List<GrMaster>> = _grMasterList.asStateFlow()
+
+    // Send status state
+    private var _sendPrintStatusCode: MutableStateFlow<SendPrintResponseStatus> =
+        MutableStateFlow(SendPrintResponseStatus.Idle)
+    val sendPrintStatusCode: StateFlow<SendPrintResponseStatus> = _sendPrintStatusCode.asStateFlow()
+
+
+    /*
+        Observed print requests state
+        First = grNumber
+        Second = PrintRequestResponse()
+    */
+    private var _observedPrintRequests: MutableStateFlow<List<NotificationItem>> =
+        MutableStateFlow(emptyList())
+    val observedPrintRequests: StateFlow<List<NotificationItem>> =
+        _observedPrintRequests.asStateFlow()
 
 
     init {
@@ -168,7 +202,7 @@ class SendPrintRequestViewModel : ViewModel() {
             listOf(
                 GrMaster(
                     id = 1,
-                    grInfoId = "GR0001",
+                    grInfoId = "GR_0001",
                     bookingId = 101,
                     crossingId = 501,
                     currentStatusId = 1,
@@ -192,7 +226,7 @@ class SendPrintRequestViewModel : ViewModel() {
                 ),
                 GrMaster(
                     id = 2,
-                    grInfoId = "GR0002",
+                    grInfoId = "GR_0002",
                     bookingId = 102,
                     crossingId = 502,
                     currentStatusId = 2,
@@ -216,7 +250,7 @@ class SendPrintRequestViewModel : ViewModel() {
                 ),
                 GrMaster(
                     id = 3,
-                    grInfoId = "GR0003",
+                    grInfoId = "GR_0003",
                     bookingId = 103,
                     crossingId = 503,
                     currentStatusId = 3,
@@ -240,7 +274,7 @@ class SendPrintRequestViewModel : ViewModel() {
                 ),
                 GrMaster(
                     id = 4,
-                    grInfoId = "GR0004",
+                    grInfoId = "GR_0004",
                     bookingId = 104,
                     crossingId = 504,
                     currentStatusId = 1,
@@ -264,7 +298,7 @@ class SendPrintRequestViewModel : ViewModel() {
                 ),
                 GrMaster(
                     id = 5,
-                    grInfoId = "GR0005",
+                    grInfoId = "GR_0005",
                     bookingId = 105,
                     crossingId = 505,
                     currentStatusId = 4,
@@ -289,4 +323,189 @@ class SendPrintRequestViewModel : ViewModel() {
             )
         }
     }
+
+    /**
+     * Sends a print request to Firebase
+     * @param companyId The selected company ID
+     * @param branchId The selected branch ID
+     * @param grNumber The GR number
+     * @param printRequest The print request data to send
+     */
+    fun sendPrintRequest(
+        companyId: String,
+        branchId: String,
+        grNumber: String,
+        printRequest: PrintRequest
+    ) {
+        viewModelScope.launch {
+            println("🔵 ViewModel: Starting print request for GR: $grNumber")
+            // Set loading state
+            _sendPrintStatusCode.update { SendPrintResponseStatus.Loading }
+            println("🔵 ViewModel: Status set to Loading")
+
+            // Create the print request response
+            val printRequestResponse = PrintRequestResponse(
+                status = PrintRequestResponseStatus.NOT_STARTED,
+                statusCode = 200,
+                message = "Print request created successfully",
+                data = printRequest
+            )
+
+            // Send to Firebase
+            println("🔵 ViewModel: Sending to Firebase...")
+            firebasePrintHelper.addPrintRequest(
+                companyId = companyId,
+                branchId = branchId,
+                grNumber = grNumber,
+                printRequestResponse = printRequestResponse,
+                onSuccess = {
+                    println("✅ ViewModel: Firebase success callback triggered")
+                    _sendPrintStatusCode.update {
+                        SendPrintResponseStatus.Success("Print request sent successfully for GR: $grNumber")
+                    }
+                    println("✅ ViewModel: Status updated to Success")
+                },
+                onFailure = { exception ->
+                    println("❌ ViewModel: Firebase failure callback triggered: ${exception.message}")
+                    _sendPrintStatusCode.update {
+                        SendPrintResponseStatus.Error(
+                            exception.message ?: "Failed to send print request"
+                        )
+                    }
+                    println("❌ ViewModel: Status updated to Error")
+                }
+            )
+        }
+    }
+
+
+    /**
+     * Starts observing print requests for a specific company and branch
+     * @param companyId The company ID to observe
+     * @param branchId The branch ID to observe
+     */
+    fun startObserving(companyId: String, branchId: String) {
+        println("🔵 ViewModel.startObserving: Starting observation for company=$companyId, branch=$branchId")
+        viewModelScope.launch {
+            firebasePrintHelper.observePrintRequests(
+                companyId = companyId,
+                branchId = branchId
+            ).catch { exception ->
+                // Handle error - emit empty list or log error
+                println("❌ ViewModel.startObserving: Error occurred - ${exception.message}")
+                _observedPrintRequests.update { emptyList() }
+            }.collect { printRequests ->
+                println("📦 ViewModel.startObserving: Received ${printRequests.size} raw items from Firebase")
+                val notificationItems = printRequests.toNotificationItems()
+                println("📦 ViewModel.startObserving: Converted to ${notificationItems.size} notification items")
+                println("📦 ViewModel.startObserving: Items = ${notificationItems.map { it.grNo }}")
+                _observedPrintRequests.update { notificationItems }
+                println("✅ ViewModel.startObserving: StateFlow updated. Current value size = ${_observedPrintRequests.value.size}")
+            }
+        }
+    }
+
+
+    /**
+     * Private function to update print request status
+     */
+    private fun updatePrintRequestStatus(
+        companyId: String,
+        branchId: String,
+        grNumber: String,
+        status: PrintRequestResponseStatus,
+        statusCode: Int,
+        message: String,
+        updatePrintStatus: Boolean,
+        successMessage: String,
+        errorMessage: String,
+        jobReference: Job?
+    ): Job {
+        println("🔵 ViewModel.updatePrintRequestStatus: Starting for GR: $grNumber, status: $status, updatePrintStatus: $updatePrintStatus")
+        jobReference?.cancel()
+
+        return viewModelScope.launch {
+            println("🔵 ViewModel.updatePrintRequestStatus: Setting Loading state")
+            _sendPrintStatusCode.update { SendPrintResponseStatus.Loading }
+
+            firebasePrintHelper.updatePrintRequestStatus(
+                companyId = companyId,
+                branchId = branchId,
+                grNumber = grNumber,
+                status = status,
+                statusCode = statusCode,
+                message = message,
+                updatePrintStatus = updatePrintStatus,
+                onSuccess = {
+                    println("✅ ViewModel.updatePrintRequestStatus: Success callback - $successMessage")
+                    _sendPrintStatusCode.value = SendPrintResponseStatus.Success(successMessage)
+                },
+                onFailure = { exception ->
+                    println("❌ ViewModel.updatePrintRequestStatus: Failure callback - ${exception.message}")
+                    _sendPrintStatusCode.value =
+                        SendPrintResponseStatus.Error(exception.message ?: errorMessage)
+                }
+            )
+        }
+    }
+
+    /**
+     * Approves a print request
+     * @param companyId The company ID
+     * @param branchId The branch ID
+     * @param grNumber The GR number to approve
+     * @param statusCode Success code (default: 200)
+     */
+    fun approvePrintRequest(
+        companyId: String,
+        branchId: String,
+        grNumber: String,
+        statusCode: Int = 200
+    ) {
+        println("🟢 ViewModel.approvePrintRequest: Called for GR: $grNumber, company: $companyId, branch: $branchId")
+        approvePrintRequestJob = updatePrintRequestStatus(
+            companyId = companyId,
+            branchId = branchId,
+            grNumber = grNumber,
+            status = PrintRequestResponseStatus.SUCCESS,
+            statusCode = statusCode,
+            message = "Request approved successfully",
+            updatePrintStatus = true,
+            successMessage = "Print request approved for GR: $grNumber",
+            errorMessage = "Failed to approve print request",
+            jobReference = if (::approvePrintRequestJob.isInitialized) approvePrintRequestJob else null
+        )
+    }
+
+    /**
+     * Rejects a print request
+     * @param companyId The company ID
+     * @param branchId The branch ID
+     * @param grNumber The GR number to reject
+     * @param code Error code (default: 400)
+     * @param message Rejection message
+     */
+    fun rejectPrintRequest(
+        companyId: String,
+        branchId: String,
+        grNumber: String,
+        code: Int = 400,
+        message: String = "Request rejected"
+    ) {
+        println("🔴 ViewModel.rejectPrintRequest: Called for GR: $grNumber, company: $companyId, branch: $branchId")
+        rejectPrintRequestJob = updatePrintRequestStatus(
+            companyId = companyId,
+            branchId = branchId,
+            grNumber = grNumber,
+            status = PrintRequestResponseStatus.FAILED,
+            statusCode = code,
+            message = message,
+            updatePrintStatus = false,
+            successMessage = "Print request rejected for GR: $grNumber",
+            errorMessage = "Failed to reject print request",
+            jobReference = if (::approvePrintRequestJob.isInitialized) approvePrintRequestJob else null
+        )
+    }
+
+
 }

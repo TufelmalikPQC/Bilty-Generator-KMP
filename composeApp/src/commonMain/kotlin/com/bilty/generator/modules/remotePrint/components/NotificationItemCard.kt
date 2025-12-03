@@ -38,6 +38,7 @@ fun NotificationItemCard(
     onApprove: () -> Unit = {},
     onReject: () -> Unit = {}
 ) {
+    println("🎴 NotificationItemCard: Composing card for GR=${notification.grNo}, Company=${notification.companyName}")
     val statusConfig = getStatusConfig(notification.status)
 
     Card(
