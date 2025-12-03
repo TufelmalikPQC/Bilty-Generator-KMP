@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GrMaster(
     val id: Long? = 0L,
-    val grInfoId: Long? = 0L,
+    val grInfoId: String? = "",
     val bookingId: Long? = 0L,
     val crossingId: Long? = 0L,
     val currentStatusId: Long? = 0L,

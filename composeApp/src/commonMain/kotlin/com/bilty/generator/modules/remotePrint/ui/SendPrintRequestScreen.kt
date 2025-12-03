@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -80,11 +81,11 @@ fun SendPrintRequestScreen(navController: NavHostController) {
     var currentBranchId by remember { mutableStateOf(branches[0].id) }
 
     // Selection states for GR - default to first item
-    var selectedGrId by remember { mutableStateOf(grMasterDetailsList[0].id) }
+    var selectedGrId by remember { mutableStateOf(grMasterDetailsList[0].id.toString()) }
 
     // Set default selection for GR when data loads
-    if (selectedGrId == null && grMasterDetailsList.isNotEmpty()) {
-        selectedGrId = grMasterDetailsList.firstOrNull()?.grInfoId
+    if (grMasterDetailsList.isNotEmpty()) {
+        selectedGrId = grMasterDetailsList.firstOrNull()?.grInfoId.toString()
     }
 
     // Show dialog if company/branch not selected and data is available
@@ -226,11 +227,13 @@ fun SendPrintRequestScreen(navController: NavHostController) {
                                                 .fillMaxWidth()
                                                 .padding(16.dp),
                                             colors = androidx.compose.material3.CardDefaults.cardColors(
-                                                containerColor = ThemeColors.printRequestPrimaryColor.copy(alpha = 0.15f)
+                                                containerColor = ThemeColors.printRequestPrimaryColor.copy(
+                                                    alpha = 0.15f
+                                                )
                                             )
                                         ) {
-                                            Column(
-                                                modifier = Modifier.padding(20.dp)
+                                            FlowRow(
+                                                modifier = Modifier.fillMaxWidth().padding(20.dp)
                                             ) {
                                                 Row(
                                                     modifier = Modifier.fillMaxWidth(),
@@ -257,7 +260,8 @@ fun SendPrintRequestScreen(navController: NavHostController) {
                                                 Spacer(modifier = Modifier.height(16.dp))
 
                                                 // Current Company
-                                                val currentCompany = companies.find { it.id == currentCompanyId }
+                                                val currentCompany =
+                                                    companies.find { it.id == currentCompanyId }
                                                 if (currentCompany != null) {
                                                     Card(
                                                         modifier = Modifier.fillMaxWidth(),
@@ -300,7 +304,8 @@ fun SendPrintRequestScreen(navController: NavHostController) {
                                                 Spacer(modifier = Modifier.height(12.dp))
 
                                                 // Current Branch
-                                                val currentBranch = branches.find { it.id == currentBranchId }
+                                                val currentBranch =
+                                                    branches.find { it.id == currentBranchId }
                                                 if (currentBranch != null) {
                                                     Card(
                                                         modifier = Modifier.fillMaxWidth(),
@@ -435,7 +440,9 @@ fun SendPrintRequestScreen(navController: NavHostController) {
                                                 GrMasterItem(
                                                     gr = grData,
                                                     isSelected = grData.grInfoId == selectedGrId,
-                                                    onSelected = { selectedGrId = grData.grInfoId }
+                                                    onSelected = {
+                                                        selectedGrId = grData.grInfoId.toString()
+                                                    }
                                                 )
                                             }
                                         }

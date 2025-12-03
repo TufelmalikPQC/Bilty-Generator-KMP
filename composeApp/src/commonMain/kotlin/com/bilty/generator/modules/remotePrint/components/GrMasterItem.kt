@@ -52,7 +52,7 @@ fun GrMasterItem(
 
         // ===== ALWAYS SHOWN ====
         Text(
-            text = gr.grInfoId.orEmpty(),
+            text = gr.grInfoId.toString(),
             style = MaterialTheme.typography.titleMedium
         )
 
