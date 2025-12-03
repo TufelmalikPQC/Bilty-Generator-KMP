@@ -79,7 +79,12 @@ actual class PrinterManager {
     }
 
 
-    actual suspend fun printBiltyTextFile(printerName: String?): PrintStatus {
+    actual suspend fun printBiltyTextFile(
+        printerName: String?,
+        fontSize: Int?,
+        isLandscapeMode: Boolean?,
+        fontFamilyName: String?
+    ): PrintStatus {
         TODO("Not yet implemented")
     }
 

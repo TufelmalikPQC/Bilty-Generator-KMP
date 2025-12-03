@@ -57,9 +57,6 @@ kotlin {
     }
 
     sourceSets {
-        commonMain {
-            resources.srcDirs("src/commonMain/composeResources")
-        }
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -67,34 +64,41 @@ kotlin {
             // Html to PDF
             implementation(libs.html.to.pdf.convertor)
         }
-        commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
+        commonMain{
+            resources.srcDirs("src/commonMain/composeResources")
 
-            // Compose-Navigation
-            implementation(libs.navigation.compose)
+            dependencies {
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+                implementation(libs.androidx.lifecycle.viewmodelCompose)
+                implementation(libs.androidx.lifecycle.runtimeCompose)
 
-            // Serialization
-            implementation(libs.kotlinx.serialization.json)
+                // Compose-Navigation
+                implementation(libs.navigation.compose)
 
-            // Material
-            implementation(compose.materialIconsExtended)
+                // Serialization
+                implementation(libs.kotlinx.serialization.json)
 
-            implementation(libs.ktor.utils)
+                // Material
+                implementation(compose.materialIconsExtended)
 
-            //Firebase
-            implementation(libs.firebase.common)
-            implementation(project.dependencies.platform(libs.firebase.bom))
-            implementation(libs.firebase.database)
+                implementation(libs.ktor.utils)
 
-            // add date time library
-            implementation(libs.kotlinx.datetime)
+                //Firebase
+                implementation(libs.firebase.common)
+                implementation(project.dependencies.platform(libs.firebase.bom))
+                implementation(libs.firebase.database)
+
+                // add date time library
+                implementation(libs.kotlinx.datetime)
+
+                implementation(libs.coil.compose)
+                implementation(libs.coil.network.okhttp)
+            }
         }
         iosMain.dependencies {
             // Ktor iOS engine

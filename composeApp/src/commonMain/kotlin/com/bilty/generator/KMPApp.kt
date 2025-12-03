@@ -9,6 +9,7 @@ import com.bilty.generator.modules.AppRoutes
 import com.bilty.generator.modules.preview.ui.PrintPreviewScreen
 import com.bilty.generator.modules.print.ui.PrinterScreen
 import com.bilty.generator.modules.printmethod.PrintMethodSelectionScreen
+import com.bilty.generator.modules.remotePrint.ui.SendPrintRequestScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -19,7 +20,7 @@ fun KMPApp() {
     MaterialTheme {
         NavHost(
             navController = navController,
-            startDestination = AppRoutes.PrintPreviewScreen
+            startDestination = AppRoutes.SendPrintRequestScreen
         ) {
             composable<AppRoutes.PrintMethodSelectionScreen> {
                 PrintMethodSelectionScreen(navController)
@@ -44,6 +45,11 @@ fun KMPApp() {
                         fontFamilyName = fontFamilyName
                     )
                 }
+            }
+
+
+            composable<AppRoutes.SendPrintRequestScreen> {
+                SendPrintRequestScreen(navController)
             }
         }
     }

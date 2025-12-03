@@ -11,6 +11,9 @@ sealed class AppRoutes {
     data object PrintPreviewScreen : AppRoutes()
 
     @Serializable
+    data object SendPrintRequestScreen : AppRoutes()
+
+    @Serializable
     data class PrinterScreen(
         var isPreviewWithImageBitmap: Boolean,
         var fontSize: Int,
