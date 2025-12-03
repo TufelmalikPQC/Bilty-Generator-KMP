@@ -3,6 +3,7 @@ package com.bilty.generator
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.bilty.generator.model.constants.Constants.DESKTOP_ICON
+import com.bilty.generator.utils.FirebaseInitializer
 import org.jetbrains.compose.resources.painterResource
 
 fun main() = application {

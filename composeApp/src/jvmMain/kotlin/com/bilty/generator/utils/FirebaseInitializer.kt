@@ -1,9 +1,12 @@
+package com.bilty.generator.utils
+
+import android.app.Application
 import com.bilty.generator.model.constants.FirebaseConstants
+import com.google.firebase.Firebase
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.FirebasePlatform
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.initialize
-import kotlinx.coroutines.tasks.await
 
 object FirebaseInitializer {
 
@@ -38,7 +41,7 @@ object FirebaseInitializer {
             .build()
 
         // STEP 3: Initialize Firebase App
-        com.google.firebase.Firebase.initialize(android.app.Application(), options)
+        Firebase.initialize(Application(), options)
 
         // STEP 4: Initialize Auth
         auth = FirebaseAuth.getInstance()
