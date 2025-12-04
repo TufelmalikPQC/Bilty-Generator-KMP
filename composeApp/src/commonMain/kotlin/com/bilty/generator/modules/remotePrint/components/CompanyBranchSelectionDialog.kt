@@ -29,9 +29,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import biltygenerator.composeapp.generated.resources.Res
+import biltygenerator.composeapp.generated.resources.button_confirm_selection
+import biltygenerator.composeapp.generated.resources.dialog_select_company_branch
+import biltygenerator.composeapp.generated.resources.label_select_branch
+import biltygenerator.composeapp.generated.resources.label_select_company
+import biltygenerator.composeapp.generated.resources.str_select_company_branch_subtitle
 import com.bilty.generator.model.data.Branch
 import com.bilty.generator.model.data.Company
 import com.bilty.generator.theme.ThemeColors
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun CompanyBranchSelectionDialog(
@@ -40,8 +47,8 @@ fun CompanyBranchSelectionDialog(
     onConfirm: (companyId: Long?, branchId: Long?) -> Unit,
     onDismiss: () -> Unit = {}
 ) {
-    var selectedCompanyId by remember { mutableStateOf<Long?>(companies.firstOrNull()?.id) }
-    var selectedBranchId by remember { mutableStateOf<Long?>(branches.firstOrNull()?.id) }
+    var selectedCompanyId by remember { mutableStateOf(companies.firstOrNull()?.id) }
+    var selectedBranchId by remember { mutableStateOf(branches.firstOrNull()?.id) }
 
     Dialog(onDismissRequest = { /* Prevent dismissal */ }) {
         Surface(
@@ -55,7 +62,7 @@ fun CompanyBranchSelectionDialog(
                 modifier = Modifier.padding(24.dp)
             ) {
                 Text(
-                    text = "Select Company and Branch",
+                    text = stringResource(Res.string.dialog_select_company_branch),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = ThemeColors.printRequestPrimaryColor
@@ -64,7 +71,7 @@ fun CompanyBranchSelectionDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Please select your company and branch to continue",
+                    text = stringResource(Res.string.str_select_company_branch_subtitle),
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
@@ -73,7 +80,7 @@ fun CompanyBranchSelectionDialog(
 
                 // Company Selection
                 Text(
-                    text = "Select Company",
+                    text = stringResource(Res.string.label_select_company),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.DarkGray
@@ -126,7 +133,7 @@ fun CompanyBranchSelectionDialog(
 
                 // Branch Selection
                 Text(
-                    text = "Select Branch",
+                    text = stringResource(Res.string.label_select_branch),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.DarkGray
@@ -193,7 +200,7 @@ fun CompanyBranchSelectionDialog(
                         ),
                         enabled = selectedCompanyId != null && selectedBranchId != null
                     ) {
-                        Text("Confirm Selection")
+                        Text(stringResource(Res.string.button_confirm_selection))
                     }
                 }
             }

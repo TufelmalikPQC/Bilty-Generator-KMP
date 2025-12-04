@@ -28,8 +28,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import biltygenerator.composeapp.generated.resources.Res
+import biltygenerator.composeapp.generated.resources.cd_close
+import biltygenerator.composeapp.generated.resources.label_notifications
+import biltygenerator.composeapp.generated.resources.message_auto_approve_print_request
+import biltygenerator.composeapp.generated.resources.message_no_new_print_requests
 import com.bilty.generator.model.data.NotificationItem
 import com.bilty.generator.theme.ThemeColors
+import org.jetbrains.compose.resources.stringResource
 
 
 @Composable
@@ -61,7 +67,7 @@ fun NotificationDrawerContent(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Notifications",
+                text = stringResource(Res.string.label_notifications),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
@@ -71,7 +77,7 @@ fun NotificationDrawerContent(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Close,
-                    contentDescription = "Close",
+                    contentDescription = stringResource(Res.string.cd_close),
                     tint = Color.White
                 )
             }
@@ -95,7 +101,7 @@ fun NotificationDrawerContent(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Auto Approve print request",
+                text = stringResource(Res.string.message_auto_approve_print_request),
                 fontSize = 14.sp,
                 color = Color.Black
             )
@@ -114,7 +120,7 @@ fun NotificationDrawerContent(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No new print requests",
+                    text = stringResource(Res.string.message_no_new_print_requests),
                     fontSize = 16.sp,
                     color = Color.Gray
                 )

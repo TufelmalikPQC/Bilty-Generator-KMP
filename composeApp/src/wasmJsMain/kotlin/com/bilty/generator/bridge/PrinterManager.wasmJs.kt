@@ -1,6 +1,7 @@
 package com.bilty.generator.bridge
 
 import com.bilty.generator.model.data.PrinterInfo
+import com.bilty.generator.model.enums.FontStyles
 import com.bilty.generator.model.enums.PrintStatus
 import kotlinx.browser.window
 import org.khronos.webgl.Int8Array
@@ -20,7 +21,7 @@ actual class PrinterManager {
         printerName: String?,
         fontSize: Int?,
         isLandscapeMode: Boolean?,
-        fontFamilyName: String?
+        fontFamilyName: FontStyles?
     ): PrintStatus {
         return try {
             val int8Array = Int8Array(pdfContentData.size)
@@ -41,12 +42,12 @@ actual class PrinterManager {
             PrintStatus.FAILED
         }
     }
-
-    actual suspend fun printBiltyTextFileText(textContent: String, printerName: String?): PrintStatus {
-        TODO("Not yet implemented")
-    }
-
-    actual suspend fun printBiltyTextFile(printerName: String?): PrintStatus {
+    actual suspend fun printBiltyTextFile(
+        printerName: String?,
+        fontSize: Int?,
+        isLandscapeMode: Boolean?,
+        fontFamilyName: FontStyles?
+    ): PrintStatus {
         TODO("Not yet implemented")
     }
 }

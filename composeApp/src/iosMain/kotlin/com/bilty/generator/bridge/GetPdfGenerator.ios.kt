@@ -2,6 +2,7 @@ package com.bilty.generator.bridge
 
 import com.bilty.generator.uiToolKit.generateRoadLineDeliveryReceipt
 import com.bilty.generator.model.data.RoadLineDeliveryReceipt
+import com.bilty.generator.model.enums.FontStyles
 import com.bilty.generator.model.interfaces.PdfGenerator
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.refTo
@@ -29,7 +30,7 @@ class PdfGeneratorIos : PdfGenerator {
         zoomLevel: Double,
         fontSize: Int,
         isLandscapeMode: Boolean,
-        fontFamilyName: String
+        fontFamilyName: FontStyles
     ): ByteArray? { // <-- Return ByteArray?
         return try {
             val html = generateRoadLineDeliveryReceipt(

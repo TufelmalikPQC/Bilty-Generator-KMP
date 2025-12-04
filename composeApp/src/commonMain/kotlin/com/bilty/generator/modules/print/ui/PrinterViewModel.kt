@@ -4,6 +4,7 @@ package com.bilty.generator.modules.print.ui
 import com.bilty.generator.bridge.PrinterManager
 import com.bilty.generator.bridge.getPdfGenerator
 import com.bilty.generator.model.data.PrinterScreenUiState
+import com.bilty.generator.model.enums.FontStyles
 import com.bilty.generator.model.enums.PrintOrientation
 import com.bilty.generator.model.enums.PrintStatus
 import com.bilty.generator.uiToolKit.getDemoRoadLineDeliveryReceipt
@@ -41,10 +42,10 @@ class PrinterViewModel {
     var selectedFontSize = MutableStateFlow(12)
         private set
 
-    var fontsList = MutableStateFlow(listOf<String>())
+    var fontsList = MutableStateFlow(listOf<FontStyles>())
         private set
 
-    var selectedFonts = MutableStateFlow("Dot Matrix")
+    var selectedFonts = MutableStateFlow(FontStyles.DOT_MATRIX)
         private set
 
     fun resetPrintStatus() {
@@ -165,7 +166,7 @@ class PrinterViewModel {
                 it.copy(
                     isPrinting = false,
                     printProgress = if (status == PrintStatus.COMPLETED) 100 else it.printProgress,
-                    printStatusMessage =  when (status) {
+                    printStatusMessage = when (status) {
                         PrintStatus.COMPLETED -> "PDF printed successfully."
                         PrintStatus.CANCELLED -> "Print cancelled."
                         PrintStatus.FAILED -> "Print failed."
@@ -264,11 +265,11 @@ class PrinterViewModel {
         viewModelScope.launch {
             fontsList.emit(
                 listOf(
-                    "Dot Matrix",
-                    "Enhanced Dot Matrix",
-                    "Digi Trace",
-                    "Dot Digital-7",
-                    "Digital-7"
+                    FontStyles.DOT_MATRIX,
+                    FontStyles.ENHANCED_DOT_MATRIX,
+                    FontStyles.DIGI_TRACE,
+                    FontStyles.DOT_DIGITAL_7,
+                    FontStyles.DIGITAL_7
                 )
             )
         }
@@ -288,7 +289,7 @@ class PrinterViewModel {
 
     fun updateFontFamily(fontFamily: String) {
         viewModelScope.launch {
-            selectedFonts.emit(fontFamily)
+            selectedFonts.emit(returnFontStyleByName(fontFamily))
         }
     }
 
@@ -298,6 +299,16 @@ class PrinterViewModel {
             if (matched != null) {
                 selectedOrientations.emit(matched)
             }
+        }
+    }
+
+    fun returnFontStyleByName(style: String): FontStyles {
+        return when (style) {
+            FontStyles.DOT_MATRIX.name -> FontStyles.DOT_MATRIX
+            FontStyles.ENHANCED_DOT_MATRIX.name -> FontStyles.ENHANCED_DOT_MATRIX
+            FontStyles.DIGI_TRACE.name -> FontStyles.DIGI_TRACE
+            FontStyles.DOT_DIGITAL_7.name -> FontStyles.DOT_DIGITAL_7
+            else -> FontStyles.ROBOTO
         }
     }
 

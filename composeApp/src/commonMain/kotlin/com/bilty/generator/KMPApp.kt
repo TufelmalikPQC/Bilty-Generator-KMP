@@ -6,10 +6,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.bilty.generator.model.enums.FontStyles
 import com.bilty.generator.modules.AppRoutes
 import com.bilty.generator.modules.preview.ui.PrintPreviewScreen
 import com.bilty.generator.modules.print.ui.PrinterScreen
-import com.bilty.generator.modules.printmethod.PrintMethodSelectionScreen
+import com.bilty.generator.modules.printmethod.ui.PrintMethodSelectionScreen
 import com.bilty.generator.modules.remotePrint.ui.SendPrintRequestScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -22,7 +23,7 @@ fun KMPApp() {
         Scaffold {paddingValues ->
             NavHost(
                 navController = navController,
-                startDestination = AppRoutes.SendPrintRequestScreen
+                startDestination = AppRoutes.PrintMethodSelectionScreen
             ) {
                 composable<AppRoutes.PrintMethodSelectionScreen> {
                     PrintMethodSelectionScreen(navController)
@@ -37,7 +38,7 @@ fun KMPApp() {
                         val isPreviewWithImageBitmap = get<Boolean>("isPreviewWithImageBitmap") ?: false
                         val fontSize = get<Int>("fontSize") ?: 24
                         val isLandscapeMode = get<Boolean>("isLandscapeMode") ?: false
-                        val fontFamilyName = get<String>("fontFamilyName") ?: "Dot Matrix"
+                        val fontFamilyName = get<String>("fontFamilyName") ?: FontStyles.DOT_MATRIX.name
 
                         PrinterScreen(
                             navController = navController,

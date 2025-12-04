@@ -44,7 +44,7 @@ import com.bilty.generator.model.enums.PrintOrientation
 import com.bilty.generator.modules.AppRoutes
 import com.bilty.generator.modules.preview.components.PreviewOptionsCard
 import com.bilty.generator.modules.print.ui.PrinterViewModel
-import com.bilty.generator.modules.printmethod.TextBiltyFilePrintButtons
+import com.bilty.generator.modules.printmethod.ui.TextBiltyFilePrintButtons
 import com.bilty.generator.uiToolKit.CommonDropdown
 import com.bilty.generator.uiToolKit.CommonRadioGroup
 import kotlinx.coroutines.launch
@@ -74,7 +74,7 @@ fun PrintPreviewScreen(navController: NavHostController) {
                     isPreviewWithImageBitmap = printWithImage,
                     fontSize = selectedFontSize,
                     isLandscapeMode = selectedOrientation == PrintOrientation.LANDSCAPE,
-                    fontFamilyName = selectedFont
+                    fontFamilyName = selectedFont.name
 
                 )
             )
@@ -150,8 +150,8 @@ fun PrintPreviewScreen(navController: NavHostController) {
                     // Font Selection Dropdown
                     CommonDropdown(
                         label = "Select Font",
-                        items = fontsList,
-                        selectedItem = selectedFont,
+                        items = fontsList.map { it.name },
+                        selectedItem = selectedFont.name,
                         onItemSelected = { viewModel.updateFontFamily(it) },
                         modifier = Modifier.padding(vertical = 8.dp)
                     )

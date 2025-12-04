@@ -1,7 +1,9 @@
 package com.bilty.generator.bridge
 
 import com.bilty.generator.model.data.PrinterInfo
+import com.bilty.generator.model.enums.FontStyles
 import com.bilty.generator.model.enums.PrintStatus
+import com.bilty.generator.model.enums.Printers
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSData
 import platform.Foundation.create
@@ -33,7 +35,7 @@ actual class PrinterManager {
         printerName: String?,
         fontSize: Int?,
         isLandscapeMode: Boolean?,
-        fontFamilyName: String?
+        fontFamilyName: FontStyles?
     ): PrintStatus {
         val printController = UIPrintInteractionController.sharedPrintController
         if (printController == null || !UIPrintInteractionController.isPrintingAvailable()) {
@@ -59,13 +61,12 @@ actual class PrinterManager {
         }
     }
 
-    actual suspend fun printRawText(ipAddress: String, port: Int, text: String): PrintStatus {
-
-    }
-
-
-
-    actual suspend fun printBiltyTextFile(printerName: String?): PrintStatus {
+    actual suspend fun printBiltyTextFile(
+        printerName: String?,
+        fontSize: Int?,
+        isLandscapeMode: Boolean?,
+        fontFamilyName: FontStyles?
+    ): PrintStatus {
         TODO("Not yet implemented")
     }
 }

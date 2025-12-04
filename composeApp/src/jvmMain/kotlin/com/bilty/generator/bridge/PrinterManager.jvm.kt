@@ -5,6 +5,7 @@ import com.bilty.generator.model.constants.Constants.BILTY_TEXT_FILE_PATH
 import com.bilty.generator.model.constants.Constants.RECEIPT_HEIGHT_POINTS
 import com.bilty.generator.model.constants.Constants.RECEIPT_WIDTH_POINTS
 import com.bilty.generator.model.data.PrinterInfo
+import com.bilty.generator.model.enums.FontStyles
 import com.bilty.generator.model.enums.PrintStatus
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
@@ -40,7 +41,7 @@ actual class PrinterManager {
         printerName: String?,
         fontSize: Int?,
         isLandscapeMode: Boolean?,
-        fontFamilyName: String?
+        fontFamilyName: FontStyles?
     ): PrintStatus = withContext(Dispatchers.IO) {
         return@withContext try {
             // Read the test file from resources - try multiple loading strategies
@@ -184,7 +185,7 @@ actual class PrinterManager {
         printerName: String?,
         fontSize: Int?,
         isLandscapeMode: Boolean?,
-        fontFamilyName: String?
+        fontFamilyName: FontStyles?
     ): PrintStatus {
         if (pdfContentData.isEmpty()) {
             logToFile("❌ printPdf: pdfContentData is empty.")

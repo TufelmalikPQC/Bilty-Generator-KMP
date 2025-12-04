@@ -36,7 +36,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import biltygenerator.composeapp.generated.resources.Res
+import biltygenerator.composeapp.generated.resources.button_print_pdf
+import biltygenerator.composeapp.generated.resources.button_print_text
+import biltygenerator.composeapp.generated.resources.cd_print_icon
+import biltygenerator.composeapp.generated.resources.message_generating_pdf
+import biltygenerator.composeapp.generated.resources.title_select_printer
 import com.bilty.generator.bridge.getPdfGenerator
 import com.bilty.generator.model.enums.PrintOrientation
 import com.bilty.generator.modules.print.components.EmptyPrinterListView
@@ -44,7 +49,7 @@ import com.bilty.generator.modules.print.components.PrinterRow
 import com.bilty.generator.uiToolKit.PrintingStatusBottomSheet
 import com.bilty.generator.uiToolKit.getDemoRoadLineDeliveryReceipt
 import com.bilty.generator.uiToolKit.getHtmlPageZoomLevel
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +86,7 @@ fun PrinterScreen(
                     zoomLevel = getHtmlPageZoomLevel(),
                     fontSize = fontSize,
                     isLandscapeMode = isLandscapeMode,
-                    fontFamilyName = fontFamilyName
+                    fontFamilyName = viewModel.returnFontStyleByName(fontFamilyName)
                 )
                 receiptHtmlByteArray = pdfData
                 isPdfGenerating = false
@@ -100,7 +105,7 @@ fun PrinterScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Select a Printer") }, actions = {
+            TopAppBar(title = { Text(stringResource(Res.string.title_select_printer)) }, actions = {
                 Button(onClick = {
                     navController.popBackStack()
                 }) {
@@ -143,11 +148,18 @@ fun PrinterScreen(
                         if (isPdfGenerating) {
                             CircularProgressIndicator()
                             Spacer(Modifier.width(8.dp))
-                            Text("GENERATING PDF...")
+                            Text(stringResource(Res.string.message_generating_pdf))
                         } else {
-                            Icon(Icons.Default.Print, contentDescription = "Print Icon")
+                            Icon(
+                                Icons.Default.Print,
+                                contentDescription = stringResource(Res.string.cd_print_icon)
+                            )
                             Spacer(Modifier.width(8.dp))
-                            Text(if (isPreviewWithImageBitmap) "PRINT PDF" else "PRINT TEXT")
+                            Text(
+                                if (isPreviewWithImageBitmap) stringResource(Res.string.button_print_pdf) else stringResource(
+                                    Res.string.button_print_text
+                                )
+                            )
                         }
                     }
                 }
@@ -193,16 +205,4 @@ fun PrinterScreen(
             onCloseAfterComplete = { viewModel.resetPrintStatus() }
         )
     }
-}
-
-@Preview
-@Composable
-fun PrinterScreenPreview() {
-    PrinterScreen(
-        navController = rememberNavController(),
-        isPreviewWithImageBitmap = true,
-        fontSize = 12,
-        isLandscapeMode = false,
-        fontFamilyName = "Roboto"
-    )
 }

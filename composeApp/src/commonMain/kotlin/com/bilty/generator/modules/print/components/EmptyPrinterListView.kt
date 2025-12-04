@@ -14,6 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import biltygenerator.composeapp.generated.resources.Res
+import biltygenerator.composeapp.generated.resources.message_no_printers_found
+import biltygenerator.composeapp.generated.resources.message_printer_list_info
+import org.jetbrains. compose.resources.stringResource
 
 @Composable
 fun EmptyPrinterListView() {
@@ -23,13 +27,13 @@ fun EmptyPrinterListView() {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "No Printers Found",
+            text = stringResource(Res.string.message_no_printers_found),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            text = "On this platform, the printer list is shown in the system's print dialog after you click 'Print'.",
+            text = stringResource(Res.string.message_printer_list_info),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodySmall
         )

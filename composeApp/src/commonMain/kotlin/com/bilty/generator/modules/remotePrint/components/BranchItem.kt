@@ -16,8 +16,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import biltygenerator.composeapp.generated.resources.Res
+import biltygenerator.composeapp.generated.resources.label_active_prefix
+import biltygenerator.composeapp.generated.resources.label_branch_id
+import biltygenerator.composeapp.generated.resources.label_company_id
+import biltygenerator.composeapp.generated.resources.label_manager_id
+import biltygenerator.composeapp.generated.resources.label_registration_date
 import com.bilty.generator.model.data.Branch
 import com.bilty.generator.theme.ThemeColors
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun BranchItem(
@@ -61,14 +68,14 @@ fun BranchItem(
         Spacer(Modifier.height(10.dp))
 
         // ===== DETAILS WITH LABELS =====
-        LabelValue("Branch ID", "#" + branch.id)
-        LabelValue("Company ID", branch.companyId)
-        LabelValue("Manager ID", branch.branchManagerId)
-        LabelValue("Registration Date", branch.registrationDate)
+        LabelValue(stringResource(Res.string.label_branch_id), "#" + branch.id)
+        LabelValue(stringResource(Res.string.label_company_id), branch.companyId)
+        LabelValue(stringResource(Res.string.label_manager_id), branch.branchManagerId)
+        LabelValue(stringResource(Res.string.label_registration_date), branch.registrationDate)
 
         // Only one that always has a label
         Text(
-            text = "Active: ${branch.isActive}",
+            text = stringResource(Res.string.label_active_prefix, branch.isActive.toString()),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary
         )

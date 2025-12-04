@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Environment
 import com.bilty.generator.model.constants.PDF
 import com.bilty.generator.model.data.RoadLineDeliveryReceipt
+import com.bilty.generator.model.enums.FontStyles
 import com.bilty.generator.model.interfaces.PdfGenerator
 import com.bilty.generator.uiToolKit.generateRoadLineDeliveryReceipt
 import com.bilty.generator.utiles.androidContextActivity
@@ -25,7 +26,7 @@ class PdfGeneratorAndroid : PdfGenerator {
         zoomLevel: Double,
         fontSize: Int,
         isLandscapeMode: Boolean,
-        fontFamilyName: String
+        fontFamilyName: FontStyles
     ): ByteArray? = withContext(Dispatchers.Main) {
         try {
             val html = generateRoadLineDeliveryReceipt(

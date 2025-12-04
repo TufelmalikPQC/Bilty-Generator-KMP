@@ -11,11 +11,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import biltygenerator.composeapp.generated.resources.Res
+import biltygenerator.composeapp.generated.resources.str_view_raw_receipt
+import biltygenerator.composeapp.generated.resources.str_view_raw_receipt_desc
+import biltygenerator.composeapp.generated.resources.str_view_receipt_with_image
+import biltygenerator.composeapp.generated.resources.str_view_receipt_with_image_desc
 import com.bilty.generator.bridge.openUrlInBrowser
 import com.bilty.generator.model.data.PreviewOptionData
 import com.bilty.generator.uiToolKit.generateRoadLineDeliveryReceipt
 import com.bilty.generator.uiToolKit.getDemoRoadLineDeliveryReceipt
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PreviewOptionsCard() {
@@ -23,8 +29,8 @@ fun PreviewOptionsCard() {
 
     val options = listOf(
         PreviewOptionData(
-            title = "View receipt with background image",
-            description = "Opens a styled preview of the receipt with branding",
+            title = stringResource(Res.string.str_view_receipt_with_image),
+            description = stringResource(Res.string.str_view_receipt_with_image_desc),
             icon = Icons.Default.Image,
             onClick = {
                 scope.launch {
@@ -39,8 +45,8 @@ fun PreviewOptionsCard() {
             }
         ),
         PreviewOptionData(
-            title = "View raw receipt data",
-            description = "See the plain text receipt information",
+            title = stringResource(Res.string.str_view_raw_receipt),
+            description = stringResource(Res.string.str_view_raw_receipt_desc),
             icon = Icons.Default.Description,
             onClick = {
                 scope.launch {
@@ -54,7 +60,6 @@ fun PreviewOptionsCard() {
                 }
             }
         )
-        // You can add more PreviewOptionData items here if needed
     )
 
     Card(

@@ -1,8 +1,112 @@
 <resources>
     <string name="app_name">Bilty Generator</string>
 
-
-
+    <!-- Screen Titles -->
+    <string name="title_select_printer">Select a Printer</string>
+    <string name="title_receipt_preview">Receipt Preview</string>
+    <string name="title_select_print_method">Select Print Method</string>
     <string name="title_print_request_screen">Print Request Screen</string>
 
+    <!-- Button Labels -->
+    <string name="button_print_pdf">PRINT PDF</string>
+    <string name="button_print_text">PRINT TEXT</string>
+    <string name="button_use_direct_print">Use Direct Print</string>
+    <string name="button_use_pdf_print">Use PDF Print</string>
+    <string name="button_confirm">Confirm</string>
+    <string name="button_close">Close</string>
+    <string name="button_change">Change</string>
+    <string name="button_confirm_selection">Confirm Selection</string>
+    <string name="button_new_print_request">New Print Request</string>
+
+    <!-- Messages -->
+    <string name="message_generating_pdf">GENERATING PDF...</string>
+    <string name="message_printing">Printing...</string>
+    <string name="message_print_completed">Print Completed</string>
+    <string name="message_no_printers_found">No Printers Found</string>
+    <string name="message_no_new_print_requests">No new print requests</string>
+    <string name="message_printer_list_info">On this platform, the printer list is shown in the system\'s print dialog after you click \'Print\'.</string>
+    <string name="message_auto_approve_print_request">Auto Approve print request</string>
+
+    <!-- Labels -->
+    <string name="label_receipt_previews">Receipt Previews</string>
+    <string name="label_print_options">Print Options</string>
+    <string name="label_choose_print_method">Choose Printing Method</string>
+    <string name="label_select_font">Select Font</string>
+    <string name="label_font_size">Font Size</string>
+    <string name="label_direct_text_print">Direct Text Print</string>
+    <string name="label_convert_pdf_print">Convert to PDF &amp; Print</string>
+    <string name="label_notifications">Notifications</string>
+    <string name="label_current_selection">Current Selection</string>
+    <string name="label_company">Company</string>
+    <string name="label_branch">Branch</string>
+    <string name="label_select_company">Select Company</string>
+    <string name="label_select_branch">Select Branch</string>
+    <string name="label_select_company_details">Select Company Details</string>
+    <string name="label_select_branch_details">Select Branch Details</string>
+    <string name="label_select_gr_details">Select GR Details</string>
+    <string name="label_admin_prefix">Admin: %1$s</string>
+    <string name="label_code_prefix">Code: %1$s</string>
+    <string name="label_active">● Active</string>
+    <string name="label_active_prefix">Active: %1$s</string>
+    <string name="label_default_company">Default Company</string>
+    <string name="label_rate_prefix">Rate: %1$s</string>
+    <string name="label_sender_prefix">Sender: %1$s</string>
+    <string name="label_receiver_prefix">Receiver: %1$s</string>
+    <string name="label_see_more">See More</string>
+    <string name="label_see_less">See Less</string>
+
+    <!-- Field Labels with colon -->
+    <string name="label_id">ID</string>
+    <string name="label_registration_date">Registration Date</string>
+    <string name="label_created_at">Created At</string>
+    <string name="label_updated_at">Updated At</string>
+    <string name="label_branch_id">Branch ID</string>
+    <string name="label_company_id">Company ID</string>
+    <string name="label_manager_id">Manager ID</string>
+    <string name="label_destination_branch">Destination Branch</string>
+    <string name="label_destination_location">Destination Location</string>
+    <string name="label_current_location_branch">Current Location Branch</string>
+    <string name="label_booking_date">Booking Date</string>
+    <string name="label_delivery_date">Delivery Date</string>
+    <string name="label_delivery_type">Delivery Type</string>
+    <string name="label_private_mark">Private Mark</string>
+    <string name="label_remarks">Remarks</string>
+    <string name="label_pod_required">POD Required</string>
+    <string name="label_pod_status">POD Status</string>
+    <string name="label_created_by">Created By</string>
+
+    <!-- Descriptions -->
+    <string name="str_choose_print_description">Select how you want to print your receipt</string>
+    <string name="str_select_print_description">Choose how you want to print your receipt:</string>
+    <string name="str_direct_print_description">Print text data directly to the printer without conversion</string>
+    <string name="str_pdf_print_description">Convert text data to PDF format first, then print the PDF document</string>
+    <string name="str_select_company_branch_subtitle">Please select your company and branch to continue</string>
+    <string name="str_select_for_printing">Select Company, Branch and GR Details for printing</string>
+    <string name="str_view_receipt_with_image">View receipt with background image</string>
+    <string name="str_view_receipt_with_image_desc">Opens a styled preview of the receipt with branding</string>
+    <string name="str_view_raw_receipt">View raw receipt data</string>
+    <string name="str_view_raw_receipt_desc">See the plain text receipt information</string>
+
+    <!-- Dialog Titles -->
+    <string name="dialog_select_company_branch">Select Company and Branch</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_close">Close</string>
+    <string name="cd_approve">Approve</string>
+    <string name="cd_reject">Reject</string>
+    <string name="cd_direct_print">Direct Print</string>
+    <string name="cd_pdf_print">PDF Print</string>
+    <string name="cd_print_icon">Print Icon</string>
+    <string name="cd_company_logo">Company Logo</string>
+    <string name="cd_expand_more">Expand More</string>
+    <string name="cd_expand_less">Expand Less</string>
+
+    <!-- Status Labels -->
+    <string name="status_not_started">Not Started</string>
+    <string name="status_pending">Pending</string>
+    <string name="status_printing">Printing</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_failed">Failed</string>
+    <string name="status_cancelled">Cancelled</string>
+    <string name="status_not_supported">Not Supported</string>
 </resources>

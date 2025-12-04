@@ -54,6 +54,18 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import biltygenerator.composeapp.generated.resources.Res
+import biltygenerator.composeapp.generated.resources.button_change
+import biltygenerator.composeapp.generated.resources.button_new_print_request
+import biltygenerator.composeapp.generated.resources.label_active
+import biltygenerator.composeapp.generated.resources.label_admin_prefix
+import biltygenerator.composeapp.generated.resources.label_branch
+import biltygenerator.composeapp.generated.resources.label_code_prefix
+import biltygenerator.composeapp.generated.resources.label_company
+import biltygenerator.composeapp.generated.resources.label_current_selection
+import biltygenerator.composeapp.generated.resources.label_select_branch_details
+import biltygenerator.composeapp.generated.resources.label_select_company_details
+import biltygenerator.composeapp.generated.resources.label_select_gr_details
+import biltygenerator.composeapp.generated.resources.str_select_for_printing
 import biltygenerator.composeapp.generated.resources.title_print_request_screen
 import com.bilty.generator.model.data.PrintRequest
 import com.bilty.generator.model.data.PrintRequestData
@@ -83,7 +95,6 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
     val companies by viewModel.companies.collectAsState()
     val branches by viewModel.branches.collectAsState()
     val grMasterDetailsList by viewModel.grMasterList.collectAsState()
-    val sendPrintStatusCode by viewModel.sendPrintStatusCode.collectAsState()
     var showRedDot by remember { mutableStateOf(false) }
 
     // Dialog and current selection state
@@ -118,7 +129,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
             if (autoApprove) {
                 val notStartedPrintRequests = newPrintRequests.filter { it.status == PrintStatus.NOT_STARTED }
                 notStartedPrintRequests.forEach { request ->
-                    println("UI: Auto-approving print request for GR=${request?.grNo}")
+                    println("UI: Auto-approving print request for GR=${request.grNo}")
                     viewModel.approvePrintRequest(
                         companyId = userCompanyId.toString(),
                         branchId = userBranchId.toString(),
@@ -298,7 +309,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
                                     .size(24.dp)
                                     .padding(end = 8.dp)
                             )
-                            Text(text = "New Print Request")
+                           Text(text = stringResource(Res.string.button_new_print_request))
                         }
                     },
                     snackbarHost = {
@@ -335,7 +346,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
                                                     verticalAlignment = Alignment.CenterVertically
                                                 ) {
                                                     Text(
-                                                        text = "Current Selection",
+                                                        text = stringResource(Res.string.label_current_selection),
                                                         fontSize = 22.sp,
                                                         fontWeight = FontWeight.Bold,
                                                         color = ThemeColors.printRequestPrimaryColor
@@ -347,7 +358,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
                                                             containerColor = ThemeColors.printRequestPrimaryColor
                                                         )
                                                     ) {
-                                                        Text("Change")
+                                                        Text(stringResource(Res.string.button_change))
                                                     }
                                                 }
 
@@ -371,7 +382,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
                                                         ) {
                                                             Column(modifier = Modifier.weight(1f)) {
                                                                 Text(
-                                                                    text = "Company",
+                                                                    text = stringResource(Res.string.label_company),
                                                                     fontSize = 12.sp,
                                                                     color = Color.Gray,
                                                                     fontWeight = FontWeight.Medium
@@ -385,7 +396,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
                                                                 )
                                                                 if (!currentCompany.adminId.isNullOrEmpty()) {
                                                                     Text(
-                                                                        text = "Admin: ${currentCompany.adminId}",
+                                                                        text = stringResource(Res.string.label_admin_prefix, currentCompany.adminId),
                                                                         fontSize = 13.sp,
                                                                         color = Color.DarkGray
                                                                     )
@@ -416,7 +427,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
                                                         ) {
                                                             Column(modifier = Modifier.weight(1f)) {
                                                                 Text(
-                                                                    text = "Branch",
+                                                                    text = stringResource(Res.string.label_branch),
                                                                     fontSize = 12.sp,
                                                                     color = Color.Gray,
                                                                     fontWeight = FontWeight.Medium
@@ -430,16 +441,16 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
                                                                 )
                                                                 if (!currentBranch.branchCode.isNullOrEmpty()) {
                                                                     Text(
-                                                                        text = "Code: ${currentBranch.branchCode}",
+                                                                        text = stringResource(Res.string.label_code_prefix, currentBranch.branchCode),
                                                                         fontSize = 13.sp,
                                                                         color = Color.DarkGray
                                                                     )
                                                                 }
                                                                 if (currentBranch.isActive) {
                                                                     Text(
-                                                                        text = "● Active",
+                                                                        text = stringResource(Res.string.label_active),
                                                                         fontSize = 12.sp,
-                                                                        color = Color(0xFF388E3C)
+                                                                        color = ThemeColors.activeStatusColor
                                                                     )
                                                                 }
                                                             }
@@ -455,7 +466,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
 
                                 item {
                                     Text(
-                                        text = "Select Company, Branch and GR Details for printing",
+                                        text = stringResource(Res.string.str_select_for_printing),
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(16.dp)
@@ -473,7 +484,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
                                     ) {
                                         Column {
                                             Text(
-                                                text = "Select Company Details",
+                                                text = stringResource(Res.string.label_select_company_details),
                                                 fontSize = 18.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(16.dp)
@@ -499,7 +510,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
                                     ) {
                                         Column {
                                             Text(
-                                                text = "Select Branch Details",
+                                                text = stringResource(Res.string.label_select_branch_details),
                                                 fontSize = 18.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(16.dp)
@@ -525,7 +536,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
                                     ) {
                                         Column {
                                             Text(
-                                                text = "Select GR Details",
+                                                text = stringResource(Res.string.label_select_gr_details),
                                                 fontSize = 18.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 modifier = Modifier.padding(16.dp)

@@ -25,6 +25,15 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.bilty.generator.model.data.Company
 import com.bilty.generator.theme.ThemeColors
+import biltygenerator.composeapp.generated.resources.Res
+import biltygenerator.composeapp.generated.resources.cd_company_logo
+import biltygenerator.composeapp.generated.resources.label_active_prefix
+import biltygenerator.composeapp.generated.resources.label_created_at
+import biltygenerator.composeapp.generated.resources.label_default_company
+import biltygenerator.composeapp.generated.resources.label_id
+import biltygenerator.composeapp.generated.resources.label_registration_date
+import biltygenerator.composeapp.generated.resources.label_updated_at
+import org.jetbrains.compose.resources.stringResource
 import io.ktor.util.date.getTimeMillis
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -52,7 +61,7 @@ fun CompanyItem(
 
             AsyncImage(
                 model = company.companyLogo,
-                contentDescription = null,
+                contentDescription = stringResource(Res.string.cd_company_logo),
                 modifier = Modifier
                     .size(64.dp)
                     .clip(RoundedCornerShape(8.dp)),
@@ -70,7 +79,7 @@ fun CompanyItem(
 
                 if (company.isDefault == true) {
                     Text(
-                        text = "Default Company",
+                        text = stringResource(Res.string.label_default_company),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -89,14 +98,14 @@ fun CompanyItem(
 
         // ===== DETAILS WITH LABELS =====
 
-        LabelValue("ID", company.id)
-        LabelValue("Registration Date", company.registrationDate)
-        LabelValue("Created At", company.createdAt)
-        LabelValue("Updated At", company.updatedAt)
+        LabelValue(stringResource(Res.string.label_id), company.id)
+        LabelValue(stringResource(Res.string.label_registration_date), company.registrationDate)
+        LabelValue(stringResource(Res.string.label_created_at), company.createdAt)
+        LabelValue(stringResource(Res.string.label_updated_at), company.updatedAt)
 
         // Only isActive is forced to have a label
         Text(
-            text = "Active: ${company.isActive}",
+            text = stringResource(Res.string.label_active_prefix, company.isActive.toString()),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary
         )

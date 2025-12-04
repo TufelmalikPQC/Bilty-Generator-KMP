@@ -1,6 +1,7 @@
 package com.bilty.generator.model.interfaces
 
 import com.bilty.generator.model.data.RoadLineDeliveryReceipt
+import com.bilty.generator.model.enums.FontStyles
 
 interface PdfGenerator {
     /**
@@ -14,6 +15,6 @@ interface PdfGenerator {
         zoomLevel: Double,
         fontSize: Int,
         isLandscapeMode: Boolean,
-        fontFamilyName: String
+        fontFamilyName: FontStyles
     ): ByteArray?
 }

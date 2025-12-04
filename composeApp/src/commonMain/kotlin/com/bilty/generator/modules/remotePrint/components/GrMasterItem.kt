@@ -25,8 +25,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import biltygenerator.composeapp.generated.resources.Res
+import biltygenerator.composeapp.generated.resources.cd_expand_less
+import biltygenerator.composeapp.generated.resources.cd_expand_more
+import biltygenerator.composeapp.generated.resources.label_booking_date
+import biltygenerator.composeapp.generated.resources.label_created_by
+import biltygenerator.composeapp.generated.resources.label_current_location_branch
+import biltygenerator.composeapp.generated.resources.label_delivery_date
+import biltygenerator.composeapp.generated.resources.label_delivery_type
+import biltygenerator.composeapp.generated.resources.label_destination_branch
+import biltygenerator.composeapp.generated.resources.label_destination_location
+import biltygenerator.composeapp.generated.resources.label_pod_required
+import biltygenerator.composeapp.generated.resources.label_pod_status
+import biltygenerator.composeapp.generated.resources.label_private_mark
+import biltygenerator.composeapp.generated.resources.label_rate_prefix
+import biltygenerator.composeapp.generated.resources.label_receiver_prefix
+import biltygenerator.composeapp.generated.resources.label_remarks
+import biltygenerator.composeapp.generated.resources.label_see_less
+import biltygenerator.composeapp.generated.resources.label_see_more
+import biltygenerator.composeapp.generated.resources.label_sender_prefix
 import com.bilty.generator.model.data.GrMaster
 import com.bilty.generator.theme.ThemeColors
+import org.jetbrains.compose.resources.stringResource
 
 
 @Composable
@@ -59,17 +79,17 @@ fun GrMasterItem(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = "Rate: ${gr.rateType}",
+            text = stringResource(Res.string.label_rate_prefix, gr.rateType.toString()),
             style = MaterialTheme.typography.bodyMedium
         )
 
         Text(
-            text = "Sender: ${gr.senderId}",
+            text = stringResource(Res.string.label_sender_prefix, gr.senderId.toString()),
             style = MaterialTheme.typography.bodyMedium
         )
 
         Text(
-            text = "Receiver: ${gr.receiverId}",
+            text = stringResource(Res.string.label_receiver_prefix, gr.receiverId.toString()),
             style = MaterialTheme.typography.bodyMedium
         )
 
@@ -79,18 +99,17 @@ fun GrMasterItem(
         // ===== EXPANDED BLOCK =====
         AnimatedVisibility(expanded) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-
-                LabelValue("Destination Branch", gr.destinationBranchId)
-                LabelValue("Destination Location", gr.destinationLocation)
-                LabelValue("Current Location Branch", gr.currentLocationBranchId)
-                LabelValue("Booking Date", gr.bookingDate)
-                LabelValue("Delivery Date", gr.deliveryDate)
-                LabelValue("Delivery Type", gr.deliveryTypeId)
-                LabelValue("Private Mark", gr.privateMark)
-                LabelValue("Remarks", gr.remarks)
-                LabelValue("POD Required", gr.isPodRequired)
-                LabelValue("POD Status", gr.podStatusId)
-                LabelValue("Created By", gr.createdBy)
+                LabelValue(stringResource(Res.string.label_destination_branch), gr.destinationBranchId)
+                LabelValue(stringResource(Res.string.label_destination_location), gr.destinationLocation)
+                LabelValue(stringResource(Res.string.label_current_location_branch), gr.currentLocationBranchId)
+                LabelValue(stringResource(Res.string.label_booking_date), gr.bookingDate)
+                LabelValue(stringResource(Res.string.label_delivery_date), gr.deliveryDate)
+                LabelValue(stringResource(Res.string.label_delivery_type), gr.deliveryTypeId)
+                LabelValue(stringResource(Res.string.label_private_mark), gr.privateMark)
+                LabelValue(stringResource(Res.string.label_remarks), gr.remarks)
+                LabelValue(stringResource(Res.string.label_pod_required), gr.isPodRequired)
+                LabelValue(stringResource(Res.string.label_pod_status), gr.podStatusId)
+                LabelValue(stringResource(Res.string.label_created_by), gr.createdBy)
             }
         }
 
@@ -105,7 +124,7 @@ fun GrMasterItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = if (expanded) "See Less" else "See More",
+                text = if (expanded) stringResource(Res.string.label_see_less) else stringResource(Res.string.label_see_more),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -113,7 +132,7 @@ fun GrMasterItem(
             Icon(
                 imageVector = if (expanded) Icons.Default.KeyboardArrowUp
                 else Icons.Default.KeyboardArrowDown,
-                contentDescription = null
+                contentDescription = if (expanded) stringResource(Res.string.cd_expand_less) else stringResource(Res.string.cd_expand_more)
             )
         }
     }

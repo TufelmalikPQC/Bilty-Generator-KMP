@@ -1,4 +1,4 @@
-package com.bilty.generator.modules.printmethod
+package com.bilty.generator.modules.printmethod.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,7 +16,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import biltygenerator.composeapp.generated.resources.Res
+import biltygenerator.composeapp.generated.resources.button_use_direct_print
+import biltygenerator.composeapp.generated.resources.button_use_pdf_print
+import biltygenerator.composeapp.generated.resources.cd_direct_print
+import biltygenerator.composeapp.generated.resources.cd_pdf_print
+import biltygenerator.composeapp.generated.resources.label_choose_print_method
+import biltygenerator.composeapp.generated.resources.label_convert_pdf_print
+import biltygenerator.composeapp.generated.resources.label_direct_text_print
+import biltygenerator.composeapp.generated.resources.str_choose_print_description
+import biltygenerator.composeapp.generated.resources.str_direct_print_description
+import biltygenerator.composeapp.generated.resources.str_pdf_print_description
+import biltygenerator.composeapp.generated.resources.title_select_print_method
 import com.bilty.generator.modules.AppRoutes
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,7 +39,7 @@ fun PrintMethodSelectionScreen(navController: NavHostController) {
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("Select Print Method") },
+                title = { Text(stringResource(Res.string.title_select_print_method)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -45,7 +58,7 @@ fun PrintMethodSelectionScreen(navController: NavHostController) {
         ) {
             // Title
             Text(
-                text = "Choose Printing Method",
+                text = stringResource(Res.string.label_choose_print_method),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -53,7 +66,7 @@ fun PrintMethodSelectionScreen(navController: NavHostController) {
             )
 
             Text(
-                text = "Select how you want to print your receipt",
+                text = stringResource(Res.string.str_choose_print_description),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -112,7 +125,7 @@ fun TextBiltyFilePrintButtons(
             ) {
                 Icon(
                     imageVector = Icons.Default.Print,
-                    contentDescription = "Direct Print",
+                    contentDescription = stringResource(Res.string.cd_direct_print),
                     modifier = Modifier
                         .size(48.dp)
                         .padding(bottom = 16.dp),
@@ -120,14 +133,14 @@ fun TextBiltyFilePrintButtons(
                 )
 
                 Text(
-                    text = "Direct Text Print",
+                    text = stringResource(Res.string.label_direct_text_print),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
                 Text(
-                    text = "Print text data directly to the printer without conversion",
+                    text = stringResource(Res.string.str_direct_print_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -141,7 +154,7 @@ fun TextBiltyFilePrintButtons(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Use Direct Print")
+                    Text(stringResource(Res.string.button_use_direct_print))
                 }
             }
         }
@@ -161,7 +174,7 @@ fun TextBiltyFilePrintButtons(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Article,
-                    contentDescription = "PDF Print",
+                    contentDescription = stringResource(Res.string.cd_pdf_print),
                     modifier = Modifier
                         .size(48.dp)
                         .padding(bottom = 16.dp),
@@ -169,14 +182,14 @@ fun TextBiltyFilePrintButtons(
                 )
 
                 Text(
-                    text = "Convert to PDF & Print",
+                    text = stringResource(Res.string.label_convert_pdf_print),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
                 Text(
-                    text = "Convert text data to PDF format first, then print the PDF document",
+                    text = stringResource(Res.string.str_pdf_print_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -192,7 +205,7 @@ fun TextBiltyFilePrintButtons(
                         containerColor = MaterialTheme.colorScheme.secondary
                     )
                 ) {
-                    Text("Use PDF Print")
+                    Text(stringResource(Res.string.button_use_pdf_print))
                 }
             }
         }

@@ -3,6 +3,7 @@ package com.bilty.generator.bridge
 import com.bilty.generator.model.constants.Constants.Fonts.FONT_FAMILY_NAME
 import com.bilty.generator.model.constants.PDF
 import com.bilty.generator.model.data.RoadLineDeliveryReceipt
+import com.bilty.generator.model.enums.FontStyles
 import com.bilty.generator.model.interfaces.PdfGenerator
 import com.bilty.generator.uiToolKit.generateRoadLineDeliveryReceipt
 import com.bilty.generator.uiToolKit.getFontFamilyName
@@ -23,7 +24,7 @@ class PdfGeneratorDesktop : PdfGenerator {
         zoomLevel: Double,
         fontSize: Int,
         isLandscapeMode: Boolean,
-        fontFamilyName: String
+        fontFamilyName: FontStyles
     ): ByteArray? = withContext(Dispatchers.IO) {
         return@withContext try {
             println("Content Data : ${receipt.receiptNumber}")

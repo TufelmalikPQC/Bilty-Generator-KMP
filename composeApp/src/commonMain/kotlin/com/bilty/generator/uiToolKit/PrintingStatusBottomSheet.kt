@@ -20,6 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import biltygenerator.composeapp.generated.resources.Res
+import biltygenerator.composeapp.generated.resources.button_close
+import biltygenerator.composeapp.generated.resources.message_print_completed
+import biltygenerator.composeapp.generated.resources.message_printing
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +55,7 @@ fun PrintingStatusBottomSheet(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = if (!isCompleted) "Printing..." else "Print Completed",
+                    text = if (!isCompleted) stringResource(Res.string.message_printing) else stringResource(Res.string.message_print_completed),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -85,11 +90,11 @@ fun PrintingStatusBottomSheet(
 
                 if (isCompleted) {
                     Button(onClick = onCloseAfterComplete, modifier = Modifier.fillMaxWidth()) {
-                        Text("Close")
+                        Text(stringResource(Res.string.button_close))
                     }
                 }
 
-                Spacer(Modifier.height(12.dp))
+               Spacer(Modifier.height(12.dp))
             }
         }
     }

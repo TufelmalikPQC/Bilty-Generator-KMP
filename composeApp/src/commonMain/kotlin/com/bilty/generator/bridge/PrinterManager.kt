@@ -1,6 +1,7 @@
 package com.bilty.generator.bridge
 
 import com.bilty.generator.model.data.PrinterInfo
+import com.bilty.generator.model.enums.FontStyles
 import com.bilty.generator.model.enums.PrintStatus
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
@@ -27,13 +28,13 @@ expect class PrinterManager() {
         printerName: String? = null,
         fontSize: Int? = 22,
         isLandscapeMode: Boolean? = true,
-        fontFamilyName: String? = "Dot Matrix"
+        fontFamilyName: FontStyles? = FontStyles.DOT_MATRIX
     ): PrintStatus
 
     suspend fun printBiltyTextFile(
         printerName: String?,
         fontSize: Int?,
         isLandscapeMode: Boolean?,
-        fontFamilyName: String?
+        fontFamilyName: FontStyles?
     ): PrintStatus
 }

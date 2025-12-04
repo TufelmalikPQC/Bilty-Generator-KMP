@@ -28,8 +28,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import biltygenerator.composeapp.generated.resources.Res
+import biltygenerator.composeapp.generated.resources.cd_approve
+import biltygenerator.composeapp.generated.resources.cd_reject
 import com.bilty.generator.bridge.formatTimestamp
 import com.bilty.generator.model.data.NotificationItem
+import com.bilty.generator.theme.ThemeColors
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun NotificationItem(
@@ -46,7 +51,7 @@ fun NotificationItem(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clickable { /* Handle notification click */ },
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF5F5F5)
+            containerColor = ThemeColors.notificationCardBackground
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -125,12 +130,12 @@ fun NotificationItem(
                         onClick = onReject,
                         modifier = Modifier
                             .size(40.dp)
-                            .background(Color(0xFFFFEBEE), CircleShape)
+                            .background(ThemeColors.rejectButtonBackground, CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Reject",
-                            tint = Color(0xFFD32F2F),
+                            contentDescription = stringResource(Res.string.cd_reject),
+                            tint = ThemeColors.rejectButtonTint,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -142,12 +147,12 @@ fun NotificationItem(
                         onClick = onApprove,
                         modifier = Modifier
                             .size(40.dp)
-                            .background(Color(0xFFE8F5E9), CircleShape)
+                            .background(ThemeColors.approveButtonBackground, CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Check,
-                            contentDescription = "Approve",
-                            tint = Color(0xFF388E3C),
+                            contentDescription = stringResource(Res.string.cd_approve),
+                            tint = ThemeColors.approveButtonTint,
                             modifier = Modifier.size(24.dp)
                         )
                     }
