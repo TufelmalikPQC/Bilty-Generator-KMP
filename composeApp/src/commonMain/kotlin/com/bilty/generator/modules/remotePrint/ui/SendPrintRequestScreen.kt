@@ -122,7 +122,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
                     viewModel.approvePrintRequest(
                         companyId = userCompanyId.toString(),
                         branchId = userBranchId.toString(),
-                        grNumber = request.grNo.orEmpty(),
+                        grNumber = request.grNo,
                         statusCode = 200
                     )
                 }

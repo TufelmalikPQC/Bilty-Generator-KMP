@@ -129,7 +129,7 @@ fun NotificationDrawerContent(
                     key = { it.grNo }
                 ) { notification ->
                     println("📋 NotificationDrawerContent: Rendering item GR=${notification.grNo}")
-                    NotificationItemCard(
+                    NotificationItem(
                         notification = notification,
                         showApprovalButtons = !autoApprove,
                         onApprove = {

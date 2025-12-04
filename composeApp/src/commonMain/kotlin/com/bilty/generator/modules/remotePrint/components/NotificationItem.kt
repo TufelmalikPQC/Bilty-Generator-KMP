@@ -32,13 +32,12 @@ import com.bilty.generator.bridge.formatTimestamp
 import com.bilty.generator.model.data.NotificationItem
 
 @Composable
-fun NotificationItemCard(
+fun NotificationItem(
     notification: NotificationItem,
     showApprovalButtons: Boolean = false,
     onApprove: () -> Unit = {},
     onReject: () -> Unit = {}
 ) {
-    println("🎴 NotificationItemCard: Composing card for GR=${notification.grNo}, Company=${notification.companyName}")
     val statusConfig = getStatusConfig(notification.status)
 
     Card(
