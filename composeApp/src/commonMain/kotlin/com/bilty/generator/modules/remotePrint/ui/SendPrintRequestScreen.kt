@@ -1,5 +1,6 @@
 package com.bilty.generator.modules.remotePrint.ui
 
+import com.bilty.generator.model.enums.PrintStatus
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -111,18 +112,22 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
 
     // Update showRedDot when newPrintRequests changes
     LaunchedEffect(newPrintRequests.size) {
-        println("🔔 UI: newPrintRequests changed - size=${newPrintRequests.size}, items=${newPrintRequests.map { it.grNo }}")
+        println("UI: newPrintRequests changed - size=${newPrintRequests.size}, items=${newPrintRequests.map { it.grNo }}")
         if (newPrintRequests.isNotEmpty()) {
             showRedDot = true
             if (autoApprove) {
-                viewModel.approvePrintRequest(
-                    companyId = userCompanyId.toString(),
-                    branchId = userBranchId.toString(),
-                    grNumber = newPrintRequests.firstOrNull()?.grNo.orEmpty(),
-                    statusCode = 200
-                )
+                val notStartedPrintRequests = newPrintRequests.filter { it.status == PrintStatus.NOT_STARTED }
+                notStartedPrintRequests.forEach { request ->
+                    println("UI: Auto-approving print request for GR=${request?.grNo}")
+                    viewModel.approvePrintRequest(
+                        companyId = userCompanyId.toString(),
+                        branchId = userBranchId.toString(),
+                        grNumber = request.grNo.orEmpty(),
+                        statusCode = 200
+                    )
+                }
             }
-            println("🔔 UI: Red dot shown")
+            println("UI: Red dot shown")
         }else{
             showRedDot = false
             println("🔔 UI: No new print requests, red dot hidden")
