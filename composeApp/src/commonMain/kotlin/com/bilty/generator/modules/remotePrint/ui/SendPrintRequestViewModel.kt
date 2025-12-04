@@ -10,13 +10,9 @@ import com.bilty.generator.model.data.PrintRequest
 import com.bilty.generator.model.data.SendPrintResponseStatus
 import com.bilty.generator.model.enums.PrintRequestResponseStatus
 import com.bilty.generator.model.enums.RateTypeEnum
-import com.bilty.generator.model.reponse.PrintRequestResponse
 import com.bilty.generator.utils.extention.toNotificationItems
-import com.bilty.generator.utils.helpers.FirebaseRemotePrintHelper
 import io.ktor.util.date.getTimeMillis
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,8 +24,8 @@ import kotlin.time.ExperimentalTime
 
 class SendPrintRequestViewModel : ViewModel() {
 
-    // Firebase Helper
-    private val firebasePrintHelper = FirebaseRemotePrintHelper()
+    // Repository for handling remote print operations
+    private val repository = SendPrintRequestRepository()
     lateinit var approvePrintRequestJob: Job
     lateinit var rejectPrintRequestJob: Job
 
@@ -325,7 +321,7 @@ class SendPrintRequestViewModel : ViewModel() {
     }
 
     /**
-     * Sends a print request to Firebase
+     * Sends a print request to Firebase via the repository
      * @param companyId The selected company ID
      * @param branchId The selected branch ID
      * @param grNumber The GR number
@@ -343,30 +339,22 @@ class SendPrintRequestViewModel : ViewModel() {
             _sendPrintStatusCode.update { SendPrintResponseStatus.Loading }
             println("🔵 ViewModel: Status set to Loading")
 
-            // Create the print request response
-            val printRequestResponse = PrintRequestResponse(
-                status = PrintRequestResponseStatus.NOT_STARTED,
-                statusCode = 200,
-                message = "Print request created successfully",
-                data = printRequest
-            )
-
-            // Send to Firebase
-            println("🔵 ViewModel: Sending to Firebase...")
-            firebasePrintHelper.addPrintRequest(
+            // Send request via repository
+            println("🔵 ViewModel: Sending via repository...")
+            repository.sendPrintRequest(
                 companyId = companyId,
                 branchId = branchId,
                 grNumber = grNumber,
-                printRequestResponse = printRequestResponse,
+                printRequest = printRequest,
                 onSuccess = {
-                    println("✅ ViewModel: Firebase success callback triggered")
+                    println("✅ ViewModel: Repository success callback triggered")
                     _sendPrintStatusCode.update {
                         SendPrintResponseStatus.Success("Print request sent successfully for GR: $grNumber")
                     }
                     println("✅ ViewModel: Status updated to Success")
                 },
                 onFailure = { exception ->
-                    println("❌ ViewModel: Firebase failure callback triggered: ${exception.message}")
+                    println("❌ ViewModel: Repository failure callback triggered: ${exception.message}")
                     _sendPrintStatusCode.update {
                         SendPrintResponseStatus.Error(
                             exception.message ?: "Failed to send print request"
@@ -380,14 +368,14 @@ class SendPrintRequestViewModel : ViewModel() {
 
 
     /**
-     * Starts observing print requests for a specific company and branch
+     * Starts observing print requests for a specific company and branch via the repository
      * @param companyId The company ID to observe
      * @param branchId The branch ID to observe
      */
     fun startObserving(companyId: String, branchId: String) {
         println("🔵 ViewModel.startObserving: Starting observation for company=$companyId, branch=$branchId")
         viewModelScope.launch {
-            firebasePrintHelper.observePrintRequests(
+            repository.observePrintRequests(
                 companyId = companyId,
                 branchId = branchId
             ).catch { exception ->
@@ -395,7 +383,7 @@ class SendPrintRequestViewModel : ViewModel() {
                 println("❌ ViewModel.startObserving: Error occurred - ${exception.message}")
                 _observedPrintRequests.update { emptyList() }
             }.collect { printRequests ->
-                println("📦 ViewModel.startObserving: Received ${printRequests.size} raw items from Firebase")
+                println("📦 ViewModel.startObserving: Received ${printRequests.size} raw items from repository")
                 val notificationItems = printRequests.toNotificationItems()
                 println("📦 ViewModel.startObserving: Converted to ${notificationItems.size} notification items")
                 println("📦 ViewModel.startObserving: Items = ${notificationItems.map { it.grNo }}")
@@ -407,7 +395,7 @@ class SendPrintRequestViewModel : ViewModel() {
 
 
     /**
-     * Private function to update print request status
+     * Private function to update print request status via the repository
      */
     private fun updatePrintRequestStatus(
         companyId: String,
@@ -428,7 +416,7 @@ class SendPrintRequestViewModel : ViewModel() {
             println("🔵 ViewModel.updatePrintRequestStatus: Setting Loading state")
             _sendPrintStatusCode.update { SendPrintResponseStatus.Loading }
 
-            firebasePrintHelper.updatePrintRequestStatus(
+            repository.updatePrintRequestStatus(
                 companyId = companyId,
                 branchId = branchId,
                 grNumber = grNumber,
@@ -450,7 +438,7 @@ class SendPrintRequestViewModel : ViewModel() {
     }
 
     /**
-     * Approves a print request
+     * Approves a print request via the repository
      * @param companyId The company ID
      * @param branchId The branch ID
      * @param grNumber The GR number to approve
@@ -478,7 +466,7 @@ class SendPrintRequestViewModel : ViewModel() {
     }
 
     /**
-     * Rejects a print request
+     * Rejects a print request via the repository
      * @param companyId The company ID
      * @param branchId The branch ID
      * @param grNumber The GR number to reject

@@ -1,6 +1,7 @@
 package com.bilty.generator.modules.print.ui
 
 
+import androidx.lifecycle.ViewModel
 import com.bilty.generator.bridge.PrinterManager
 import com.bilty.generator.bridge.getPdfGenerator
 import com.bilty.generator.model.data.PrinterScreenUiState
@@ -18,7 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
-class PrinterViewModel {
+class PrinterViewModel : ViewModel() {
     // This is the PrinterManager we've been building
     private val printerManager = PrinterManager()
     private val viewModelScope = CoroutineScope(Dispatchers.Default)

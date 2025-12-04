@@ -23,7 +23,7 @@ fun KMPApp() {
         Scaffold {paddingValues ->
             NavHost(
                 navController = navController,
-                startDestination = AppRoutes.PrintMethodSelectionScreen
+                startDestination = AppRoutes.SendPrintRequestScreen
             ) {
                 composable<AppRoutes.PrintMethodSelectionScreen> {
                     PrintMethodSelectionScreen(navController)
