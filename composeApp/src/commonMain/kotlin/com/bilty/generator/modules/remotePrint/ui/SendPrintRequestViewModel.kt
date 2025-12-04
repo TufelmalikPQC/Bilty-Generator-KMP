@@ -22,10 +22,9 @@ import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-class SendPrintRequestViewModel : ViewModel() {
-
-    // Repository for handling remote print operations
-    private val repository = SendPrintRequestRepository()
+class SendPrintRequestViewModel(
+    private val repository: SendPrintRequestRepository
+) : ViewModel() {
     lateinit var approvePrintRequestJob: Job
     lateinit var rejectPrintRequestJob: Job
 

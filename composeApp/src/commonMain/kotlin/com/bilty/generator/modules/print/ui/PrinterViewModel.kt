@@ -19,9 +19,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
-class PrinterViewModel : ViewModel() {
-    // This is the PrinterManager we've been building
-    private val printerManager = PrinterManager()
+class PrinterViewModel(
+    private val printerManager: PrinterManager
+) : ViewModel() {
     private val viewModelScope = CoroutineScope(Dispatchers.Default)
 
     private val _uiState = MutableStateFlow(PrinterScreenUiState())

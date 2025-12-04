@@ -49,11 +49,12 @@ import com.bilty.generator.uiToolKit.CommonDropdown
 import com.bilty.generator.uiToolKit.CommonRadioGroup
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PrintPreviewScreen(navController: NavHostController) {
-    val viewModel = remember { PrinterViewModel() }
+    val viewModel = koinViewModel<PrinterViewModel>()
     val scope = rememberCoroutineScope()
 
     val orientationsList by viewModel.orientationsList.collectAsState()

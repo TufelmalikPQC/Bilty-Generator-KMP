@@ -80,6 +80,7 @@ import com.bilty.generator.theme.ThemeColors
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SendPrintRequestScreen(paddingValues: PaddingValues) {
@@ -87,7 +88,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var autoApprove by remember { mutableStateOf(true) }
-    val viewModel = remember { SendPrintRequestViewModel() }
+    val viewModel = koinViewModel<SendPrintRequestViewModel>()
 
     println("🎬 SendPrintRequestScreen: Composing screen")
 
@@ -107,11 +108,6 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
 
     // Selection states for GR - default to first item
     var selectedGrId by remember { mutableStateOf(grMasterDetailsList[0].id.toString()) }
-
-    // Set default selection for GR when data loads
-    if (grMasterDetailsList.isNotEmpty()) {
-        selectedGrId = grMasterDetailsList.firstOrNull()?.grInfoId.toString()
-    }
 
     // Show dialog if company/branch not selected and data is available
     if (userCompanyId == null && userBranchId == null &&

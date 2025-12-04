@@ -50,6 +50,7 @@ import com.bilty.generator.uiToolKit.PrintingStatusBottomSheet
 import com.bilty.generator.uiToolKit.getDemoRoadLineDeliveryReceipt
 import com.bilty.generator.uiToolKit.getHtmlPageZoomLevel
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +61,7 @@ fun PrinterScreen(
     isLandscapeMode: Boolean,
     fontFamilyName: String
 ) {
-    val viewModel = PrinterViewModel()
+    val viewModel = koinViewModel<PrinterViewModel>()
     val uiState by viewModel.uiState.collectAsState()
     var receiptHtmlByteArray by remember { mutableStateOf<ByteArray?>(null) }
     var isPdfGenerating by remember { mutableStateOf(isPreviewWithImageBitmap) }

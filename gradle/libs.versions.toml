@@ -36,8 +36,20 @@ firebaseCommon = "2.4.0"
 firebaseBom = "34.6.0"
 firebaseStorage = "2.4.0"
 
+#ktor
+koin = "4.1.1"
+koinComposeMultiplatform = "4.1.1"
 
 [libraries]
+
+# Koin
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinComposeMultiplatform" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koinComposeMultiplatform" }
+
+
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 commons-logging = { module = "commons-logging:commons-logging", version.ref = "commonsLogging" }

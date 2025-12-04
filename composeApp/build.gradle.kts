@@ -69,6 +69,10 @@ kotlin {
 
             // Html to PDF
             implementation(libs.html.to.pdf.convertor)
+
+            //koin
+            implementation(libs.koin.android)
+            implementation(libs.koin.androidx.compose)
         }
         commonMain{
             resources.srcDirs("src/commonMain/composeResources")
@@ -105,11 +109,18 @@ kotlin {
 
                 implementation(libs.coil.compose)
                 implementation(libs.coil.network.okhttp)
+
+                //koin
+                api(libs.koin.core)
+                implementation(libs.koin.compose)
+                implementation(libs.koin.compose.viewmodel)
             }
         }
         iosMain.dependencies {
             // Ktor iOS engine
             implementation(libs.ktor.client.darwin)
+            // koin
+            implementation(libs.koin.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
