@@ -2,6 +2,7 @@ package com.bilty.generator.di.viewModelModules
 
 import com.bilty.generator.modules.print.ui.PrinterViewModel
 import com.bilty.generator.modules.remotePrint.ui.SendPrintRequestViewModel
+import com.bilty.generator.modules.printqueue.PrintQueueViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -24,4 +25,10 @@ val viewModelModule = module {
      * Dependencies: SendPrintRequestRepository (injected via constructor)
      */
     viewModelOf(::SendPrintRequestViewModel)
+    
+    /**
+     * PrintQueueViewModel - Manages print queue operations
+     * Dependencies: PrintQueueRepository (injected via constructor)
+     */
+    viewModelOf(::PrintQueueViewModel)
 }

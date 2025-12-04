@@ -27,13 +27,6 @@ import androidx.compose.runtime.Composable
 @Composable
 fun getStatusConfig(status: PrintStatus): StatusConfig {
     return when (status) {
-        PrintStatus.NOT_STARTED -> StatusConfig(
-            icon = Icons.Filled.FiberManualRecord,
-            iconColor = ThemeColors.statusGray,
-            backgroundColor = ThemeColors.statusBackgroundLightGray,
-            label = stringResource(Res.string.status_not_started)
-        )
-
         PrintStatus.PENDING -> StatusConfig(
             icon = Icons.Filled.Schedule,
             iconColor = ThemeColors.statusOrange,
@@ -67,13 +60,6 @@ fun getStatusConfig(status: PrintStatus): StatusConfig {
             iconColor = ThemeColors.statusDarkOrange,
             backgroundColor = ThemeColors.statusBackgroundLightOrangeRed,
             label = stringResource(Res.string.status_cancelled)
-        )
-
-        PrintStatus.NOT_SUPPORTED -> StatusConfig(
-            icon = Icons.Filled.Block,
-            iconColor = ThemeColors.statusPurple,
-            backgroundColor = ThemeColors.statusBackgroundLightPurple,
-            label = stringResource(Res.string.status_not_supported)
         )
     }
 }

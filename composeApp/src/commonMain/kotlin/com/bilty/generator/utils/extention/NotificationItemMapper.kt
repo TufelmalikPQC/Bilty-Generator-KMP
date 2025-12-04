@@ -14,7 +14,7 @@ fun List<Pair<String, PrintRequestResponse>>.toNotificationItems(): List<Notific
         val printRequest = response.data
         val companyName = printRequest?.printData?.branchName ?: "Unknown Company"
         val timestamp = printRequest?.printData?.receiptDate ?: Clock.System.now().toEpochMilliseconds()
-        val status = printRequest?.printStatus ?: com.bilty.generator.model.enums.PrintStatus.NOT_STARTED
+        val status = printRequest?.printStatus ?: com.bilty.generator.model.enums.PrintStatus.PENDING
 
         println("toNotificationItems: Creating NotificationItem for GR=$grNo (company=$companyName, status=$status)")
 

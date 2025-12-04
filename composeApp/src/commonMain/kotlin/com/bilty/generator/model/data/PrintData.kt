@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PrintRequest(
-    val printStatus: PrintStatus = PrintStatus.NOT_STARTED,
+    val printStatus: PrintStatus = PrintStatus.PENDING,
     val printerFormat: Printers = Printers.DOT_MATRIX,
     val printData: PrintRequestData? = PrintRequestData(),
     val companyId: String = "",

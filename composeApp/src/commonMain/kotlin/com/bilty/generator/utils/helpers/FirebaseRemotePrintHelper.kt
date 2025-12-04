@@ -1,6 +1,6 @@
 package com.bilty.generator.utils.helpers
 
-import com.bilty.generator.model.enums.PrintRequestResponseStatus
+import com.bilty.generator.model.constants.FirebaseConstants
 import com.bilty.generator.model.enums.PrintStatus
 import com.bilty.generator.model.reponse.PrintRequestResponse
 import dev.gitlive.firebase.Firebase
@@ -53,10 +53,10 @@ class FirebaseRemotePrintHelper {
      * @param companyId The company ID
      * @param branchId The branch ID
      * @param grNumber The GR number
-     * @param status The status to set (SUCCESS or FAILED)
+     * @param status The status to set (COMPLETED or FAILED)
      * @param statusCode The status code to set
      * @param message The message to set
-     * @param updatePrintStatus Whether to update the print status to PRINTING (only for SUCCESS)
+     * @param updatePrintStatus Whether to update the print status to PENDING (only for COMPLETED)
      * @param onSuccess Callback when update succeeds
      * @param onFailure Callback when update fails
      */
@@ -64,7 +64,7 @@ class FirebaseRemotePrintHelper {
         companyId: String,
         branchId: String,
         grNumber: String,
-        status: PrintRequestResponseStatus,
+        status: PrintStatus,
         statusCode: Int,
         message: String,
         updatePrintStatus: Boolean = false,
@@ -93,9 +93,9 @@ class FirebaseRemotePrintHelper {
                 statusCode = statusCode,
                 message = message,
                 data =
-                    if (updatePrintStatus && status == PrintRequestResponseStatus.SUCCESS) {
-                        println("🖨 Updating printStatus → PRINTING")
-                        existingData.data?.copy(printStatus = PrintStatus.PRINTING)
+                    if (updatePrintStatus && status == PrintStatus.COMPLETED) {
+                        println("🖨 Updating printStatus → PENDING")
+                        existingData.data?.copy(printStatus = PrintStatus.PENDING)
                     } else {
                         existingData.data?.copy(printStatus = PrintStatus.CANCELLED)
                     }
@@ -163,7 +163,7 @@ class FirebaseRemotePrintHelper {
                     }
 
                     if (grNumber.isNotEmpty() &&
-                        printRequest.status != PrintRequestResponseStatus.PRINTED
+                        printRequest.status != PrintStatus.COMPLETED
                     ) {
                         printRequests.add(grNumber to printRequest)
                         println("observePrintRequests: ✅ Added GR=$grNumber (status=${printRequest.status})")
@@ -215,10 +215,10 @@ class FirebaseRemotePrintHelper {
 
             // Update with new values using data class
             val updatedResponse = existingData?.copy(
-                status = PrintRequestResponseStatus.PRINTED,
+                status = PrintStatus.COMPLETED,
                 message = "Print completed successfully"
             ) ?: PrintRequestResponse(
-                status = PrintRequestResponseStatus.PRINTED,
+                status = PrintStatus.COMPLETED,
                 message = "Print completed successfully"
             )
 
@@ -235,7 +235,8 @@ class FirebaseRemotePrintHelper {
         branchId: String,
         grNumber: String
     ): DatabaseReference {
-        return database.reference("company_$companyId").child("branch_$branchId")
+        return database.reference("${FirebaseConstants.Nodes.Prefixes.COMPANY}$companyId")
+            .child("${FirebaseConstants.Nodes.Prefixes.BRANCH}$branchId")
             .child("print").child(grNumber)
     }
 }

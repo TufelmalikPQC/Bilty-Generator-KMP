@@ -8,7 +8,7 @@ import com.bilty.generator.model.data.GrMaster
 import com.bilty.generator.model.data.NotificationItem
 import com.bilty.generator.model.data.PrintRequest
 import com.bilty.generator.model.data.SendPrintResponseStatus
-import com.bilty.generator.model.enums.PrintRequestResponseStatus
+import com.bilty.generator.model.enums.PrintStatus
 import com.bilty.generator.model.enums.RateTypeEnum
 import com.bilty.generator.utils.extention.toNotificationItems
 import io.ktor.util.date.getTimeMillis
@@ -400,7 +400,7 @@ class SendPrintRequestViewModel(
         companyId: String,
         branchId: String,
         grNumber: String,
-        status: PrintRequestResponseStatus,
+        status: PrintStatus,
         statusCode: Int,
         message: String,
         updatePrintStatus: Boolean,
@@ -454,7 +454,7 @@ class SendPrintRequestViewModel(
             companyId = companyId,
             branchId = branchId,
             grNumber = grNumber,
-            status = PrintRequestResponseStatus.SUCCESS,
+            status = PrintStatus.COMPLETED,
             statusCode = statusCode,
             message = "Request approved successfully",
             updatePrintStatus = true,
@@ -484,7 +484,7 @@ class SendPrintRequestViewModel(
             companyId = companyId,
             branchId = branchId,
             grNumber = grNumber,
-            status = PrintRequestResponseStatus.FAILED,
+            status = PrintStatus.FAILED,
             statusCode = code,
             message = message,
             updatePrintStatus = false,

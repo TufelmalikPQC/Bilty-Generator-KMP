@@ -1,48 +1,41 @@
 package com.bilty.generator.modules.remotePrint.ui
 
+import com.bilty.generator.model.data.PrintJob
 import com.bilty.generator.model.data.PrintRequest
-import com.bilty.generator.model.enums.PrintRequestResponseStatus
+import com.bilty.generator.model.data.PrintRequestData
+import com.bilty.generator.model.enums.PrintStatus
 import com.bilty.generator.model.reponse.PrintRequestResponse
-import com.bilty.generator.utils.helpers.FirebaseRemotePrintHelper
+import com.bilty.generator.modules.printqueue.PrintQueueRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 
 /**
  * Repository class for handling remote print operations with Firebase.
- * This class acts as a single source of truth for print-related data operations,
- * following the MVVM architecture pattern.
+ * NOW USES DUAL-NODE STRUCTURE via PrintQueueRepository
+ * 
+ * This maintains the same API but internally uses:
+ * - printJobs/{fbNodeId} for full data
+ * - printIndex/{companyId}/{branchId}/{grNo} for fast lookup
  *
- * Responsibilities:
- * - Manages communication with Firebase for print requests
- * - Provides methods for CRUD operations on print requests
- * - Handles data transformation and error handling
- * - Observes real-time updates from Firebase
- *
- * Design Pattern:
- * - Follows Repository pattern to abstract data source details from ViewModel
- * - All Firebase operations are delegated to FirebaseRemotePrintHelper
- * - Provides a clean API with suspend functions and Flow for reactive data
- *
- * @property firebasePrintHelper Helper class for Firebase Realtime Database operations
+ * @property printQueueRepository Repository managing dual-node Firebase structure
  */
 class SendPrintRequestRepository {
 
-    private val firebasePrintHelper = FirebaseRemotePrintHelper()
+    private val printQueueRepository = PrintQueueRepository()
+    
+    // Map to store fbNodeId for each grNumber for status updates
+    private val grToFbNodeMap = mutableMapOf<String, String>()
 
     /**
-     * Sends a new print request to Firebase Realtime Database.
-     * Creates a new print request node at path: company_{companyId}/branch_{branchId}/print/{grNumber}
-     *
-     * Use Case:
-     * - Used when a user initiates a new print request from the sender app
-     * - Creates initial request with NOT_STARTED status
-     *
+     * Sends a new print request to Firebase using dual-node structure
+     * 
      * @param companyId The unique identifier of the company
      * @param branchId The unique identifier of the branch
-     * @param grNumber The GR (Goods Receipt) number - unique identifier for the print job
-     * @param printRequest The print request data containing all necessary printing information
-     * @param onSuccess Callback invoked when the request is successfully added to Firebase
-     * @param onFailure Callback invoked when the request fails, provides the exception for error handling
+     * @param grNumber The GR number - unique identifier for the print job
+     * @param printRequest The print request data
+     * @param onSuccess Callback invoked when the request is successfully added
+     * @param onFailure Callback invoked when the request fails
      */
     suspend fun sendPrintRequest(
         companyId: String,
@@ -52,84 +45,94 @@ class SendPrintRequestRepository {
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        // Create the print request response wrapper with initial status
-        val printRequestResponse = PrintRequestResponse(
-            status = PrintRequestResponseStatus.NOT_STARTED,
-            statusCode = 200,
-            message = "Print request created successfully",
-            data = printRequest
-        )
-
-        // Delegate to Firebase helper to add the request
-        firebasePrintHelper.addPrintRequest(
+        println("🔵 SendPrintRequestRepository.sendPrintRequest: GR=$grNumber")
+        
+        // Extract print data from PrintRequest
+        val printData = printRequest.printData ?: PrintRequestData()
+        
+        // Add to dual-node structure via PrintQueueRepository
+        printQueueRepository.addToPrintQueue(
+            grNo = grNumber,
+            printData = printData,
             companyId = companyId,
             branchId = branchId,
-            grNumber = grNumber,
-            printRequestResponse = printRequestResponse,
-            onSuccess = onSuccess,
-            onFailure = onFailure
+            onSuccess = { fbNodeId ->
+                println("✅ SendPrintRequestRepository: Print request added with fbNodeId=$fbNodeId")
+                // Store mapping for future status updates
+                grToFbNodeMap[grNumber] = fbNodeId
+                onSuccess()
+            },
+            onFailure = { exception ->
+                println("❌ SendPrintRequestRepository: Failed to add print request - ${exception.message}")
+                onFailure(exception)
+            }
         )
     }
 
     /**
-     * Updates the status of an existing print request in Firebase.
-     * Reads existing data, updates specified fields, and writes back to Firebase.
-     *
-     * Use Case:
-     * - Used to change request status (e.g., from NOT_STARTED to SUCCESS/FAILED)
-     * - Updates print status when request is approved (sets to PRINTING)
-     * - Updates print status when request is rejected (sets to CANCELLED)
-     *
+     * Updates the status of an existing print request
+     * 
      * @param companyId The unique identifier of the company
      * @param branchId The unique identifier of the branch
      * @param grNumber The GR number to update
-     * @param status The new status for the print request (SUCCESS, FAILED, etc.)
-     * @param statusCode HTTP-like status code (e.g., 200 for success, 400 for client error, 500 for server error)
-     * @param message Descriptive message about the status update (e.g., "Request approved successfully")
-     * @param updatePrintStatus Whether to update the internal print status to PRINTING (true for approve, false for reject)
+     * @param status The new status for the print request
+     * @param statusCode HTTP-like status code
+     * @param message Descriptive message about the status update
+     * @param updatePrintStatus Whether to update the internal print status (legacy parameter, now mapped to status)
      * @param onSuccess Callback invoked when the update is successful
-     * @param onFailure Callback invoked when the update fails, provides the exception
+     * @param onFailure Callback invoked when the update fails
      */
     suspend fun updatePrintRequestStatus(
         companyId: String,
         branchId: String,
         grNumber: String,
-        status: PrintRequestResponseStatus,
+        status: PrintStatus,
         statusCode: Int,
         message: String,
         updatePrintStatus: Boolean,
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        firebasePrintHelper.updatePrintRequestStatus(
+        println("🔵 SendPrintRequestRepository.updatePrintRequestStatus: GR=$grNumber, status=$status")
+        
+        // Get fbNodeId from map or try to fetch from Firebase
+        val fbNodeId = grToFbNodeMap[grNumber]
+        
+        if (fbNodeId == null) {
+            println("⚠️ SendPrintRequestRepository: fbNodeId not found for GR=$grNumber, trying to fetch from index...")
+            // Try to find it by observing once (this is a fallback)
+            onFailure(Exception("Cannot update: fbNodeId not found for GR=$grNumber. Job might not exist."))
+            return
+        }
+        
+        // Update status in dual-node structure
+        printQueueRepository.updatePrintStatus(
+            fbNodeId = fbNodeId,
+            grNo = grNumber,
             companyId = companyId,
             branchId = branchId,
-            grNumber = grNumber,
-            status = status,
-            statusCode = statusCode,
-            message = message,
-            updatePrintStatus = updatePrintStatus,
-            onSuccess = onSuccess,
-            onFailure = onFailure
+            newStatus = status,
+            onSuccess = {
+                println("✅ SendPrintRequestRepository: Status updated successfully")
+                onSuccess()
+            },
+            onFailure = { exception ->
+                println("❌ SendPrintRequestRepository: Failed to update status - ${exception.message}")
+                onFailure(exception)
+            }
         )
     }
 
     /**
-     * Approves a print request by updating its status to SUCCESS.
-     * This marks the request as approved and ready for printing.
-     * Also updates the print status to PRINTING if updatePrintStatus is true.
-     *
-     * Use Case:
-     * - Receiver app calls this when user approves a pending print request
-     * - Changes status from NOT_STARTED to SUCCESS
-     * - Triggers the actual printing process
-     *
+     * Approves a print request by updating its status to PRINTING
+     * The job will be marked as PRINTING to indicate it's being processed
+     * 
      * @param companyId The unique identifier of the company
      * @param branchId The unique identifier of the branch
      * @param grNumber The GR number to approve
      * @param statusCode Success status code (default: 200 - OK)
      * @param onSuccess Callback invoked when approval is successful
-     * @param onFailure Callback invoked when approval fails, provides the exception
+     * @param onFailure Callback invoked when approval fails
      */
     suspend fun approvePrintRequest(
         companyId: String,
@@ -143,39 +146,32 @@ class SendPrintRequestRepository {
             companyId = companyId,
             branchId = branchId,
             grNumber = grNumber,
-            status = PrintRequestResponseStatus.SUCCESS,
+            status = PrintStatus.PRINTING,  // Changed from COMPLETED to PRINTING
             statusCode = statusCode,
-            message = "Request approved successfully",
-            updatePrintStatus = true, // Set print status to PRINTING
+            message = "Print request approved and started",
+            updatePrintStatus = true,
             onSuccess = onSuccess,
             onFailure = onFailure
         )
     }
 
     /**
-     * Rejects a print request by updating its status to FAILED.
-     * This marks the request as rejected and will not be printed.
-     * Sets the print status to CANCELLED.
-     *
-     * Use Case:
-     * - Receiver app calls this when user rejects/cancels a print request
-     * - Changes status from NOT_STARTED to FAILED
-     * - Notifies sender that the request was rejected
-     *
+     * Rejects a print request by updating its status to CANCELLED
+     * 
      * @param companyId The unique identifier of the company
      * @param branchId The unique identifier of the branch
      * @param grNumber The GR number to reject
      * @param statusCode Error status code (default: 400 - Bad Request)
-     * @param message Rejection reason or message (e.g., "Printer offline", "Request rejected by user")
+     * @param message Rejection reason or message
      * @param onSuccess Callback invoked when rejection is successful
-     * @param onFailure Callback invoked when rejection fails, provides the exception
+     * @param onFailure Callback invoked when rejection fails
      */
     suspend fun rejectPrintRequest(
         companyId: String,
         branchId: String,
         grNumber: String,
         statusCode: Int = 400,
-        message: String = "Request rejected",
+        message: String = "Request rejected by user",
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
@@ -183,69 +179,72 @@ class SendPrintRequestRepository {
             companyId = companyId,
             branchId = branchId,
             grNumber = grNumber,
-            status = PrintRequestResponseStatus.FAILED,
+            status = PrintStatus.CANCELLED,  // Changed from FAILED to CANCELLED
             statusCode = statusCode,
             message = message,
-            updatePrintStatus = false, // Set print status to CANCELLED
+            updatePrintStatus = false,
             onSuccess = onSuccess,
             onFailure = onFailure
         )
     }
 
     /**
-     * Observes print requests in real-time for a specific company and branch.
-     * Returns a Flow that emits updates whenever print requests change in Firebase.
-     * Automatically filters out requests with PRINTED status.
-     *
-     * Use Case:
-     * - Receiver app uses this to listen for incoming print requests
-     * - Provides real-time updates when new requests are added or existing ones are modified
-     * - Filters completed (PRINTED) requests automatically
-     *
-     * Flow Behavior:
-     * - Emits list of (GR Number, PrintRequestResponse) pairs
-     * - Emits on initial subscription with current data
-     * - Emits whenever data changes in Firebase
-     * - Emits empty list on error (with error logged)
-     * - Automatically cancels when collector is cancelled
-     *
+     * Observes print requests in real-time for a specific company and branch
+     * Returns data in the OLD format (PrintRequestResponse) for backward compatibility
+     * 
      * @param companyId The unique identifier of the company to observe
      * @param branchId The unique identifier of the branch to observe
-     * @return Flow emitting list of Pair<String, PrintRequestResponse> where String is the GR number
+     * @return Flow emitting list of Pair<String, PrintRequestResponse>
      */
     fun observePrintRequests(
         companyId: String,
         branchId: String
     ): Flow<List<Pair<String, PrintRequestResponse>>> {
-        return firebasePrintHelper.observePrintRequests(
-            companyId = companyId,
-            branchId = branchId
-        ).catch { exception ->
-            // Log error and emit empty list on failure to prevent crashes
-            println("❌ Repository.observePrintRequests: Error - ${exception.message}")
-            exception.printStackTrace()
-            emit(emptyList())
-        }
+        println("🔵 SendPrintRequestRepository.observePrintRequests: company=$companyId, branch=$branchId")
+        
+        return printQueueRepository.observePrintQueue(companyId, branchId)
+            .map { printJobs ->
+                println("📦 SendPrintRequestRepository: Converting ${printJobs.size} PrintJobs to PrintRequestResponses")
+                
+                // Store fbNodeId mappings for future updates
+                printJobs.forEach { (fbNodeId, printJob) ->
+                    grToFbNodeMap[printJob.grNo] = fbNodeId
+                }
+                
+                // Convert PrintJob to PrintRequestResponse format for backward compatibility
+                printJobs.map { (fbNodeId, printJob) ->
+                    val printRequest = PrintRequest(
+                        printStatus = printJob.status,
+                        printData = printJob.printData,
+                        companyId = printJob.companyId,
+                        branchId = printJob.branchId,
+                        grMasterId = printJob.grNo
+                    )
+                    
+                    val printRequestResponse = PrintRequestResponse(
+                        status = printJob.status,
+                        statusCode = 200,
+                        message = "Print job retrieved",
+                        data = printRequest
+                    )
+                    
+                    printJob.grNo to printRequestResponse
+                }
+            }
+            .catch { exception ->
+                println("❌ SendPrintRequestRepository.observePrintRequests: Error - ${exception.message}")
+                emit(emptyList())
+            }
     }
 
     /**
-     * Marks a print request as PRINTED after successful printing.
-     * This is the final status in the print request lifecycle.
-     *
-     * Use Case:
-     * - Receiver app calls this after successfully printing the document
-     * - Removes the request from active/pending lists
-     * - Provides audit trail of completed prints
-     *
-     * Lifecycle:
-     * NOT_STARTED → SUCCESS (approved) → PRINTING → PRINTED (completed)
-     * NOT_STARTED → FAILED (rejected/error)
-     *
+     * Marks a print request as COMPLETED after successful printing
+     * 
      * @param companyId The unique identifier of the company
      * @param branchId The unique identifier of the branch
      * @param grNumber The GR number to mark as printed
      * @param onSuccess Callback invoked when marking is successful
-     * @param onFailure Callback invoked when marking fails, provides the exception
+     * @param onFailure Callback invoked when marking fails
      */
     suspend fun markAsPrinted(
         companyId: String,
@@ -254,10 +253,14 @@ class SendPrintRequestRepository {
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        firebasePrintHelper.markAsPrinted(
+        updatePrintRequestStatus(
             companyId = companyId,
             branchId = branchId,
             grNumber = grNumber,
+            status = PrintStatus.COMPLETED,
+            statusCode = 200,
+            message = "Print completed successfully",
+            updatePrintStatus = true,
             onSuccess = onSuccess,
             onFailure = onFailure
         )

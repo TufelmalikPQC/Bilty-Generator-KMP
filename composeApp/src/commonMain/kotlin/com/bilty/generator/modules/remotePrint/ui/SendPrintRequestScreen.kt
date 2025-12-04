@@ -107,7 +107,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
     var selectedBranchId by remember { mutableStateOf(branches[0].id) }
 
     // Selection states for GR - default to first item
-    var selectedGrId by remember { mutableStateOf(grMasterDetailsList[0].id.toString()) }
+    var selectedGrId by remember { mutableStateOf(grMasterDetailsList[0].grInfoId.orEmpty()) }
 
     // Show dialog if company/branch not selected and data is available
     if (userCompanyId == null && userBranchId == null &&
@@ -123,7 +123,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
         if (newPrintRequests.isNotEmpty()) {
             showRedDot = true
             if (autoApprove) {
-                val notStartedPrintRequests = newPrintRequests.filter { it.status == PrintStatus.NOT_STARTED }
+                val notStartedPrintRequests = newPrintRequests.filter { it.status == PrintStatus.PENDING }
                 notStartedPrintRequests.forEach { request ->
                     println("UI: Auto-approving print request for GR=${request.grNo}")
                     viewModel.approvePrintRequest(
@@ -543,7 +543,7 @@ fun SendPrintRequestScreen(paddingValues: PaddingValues) {
                                                     gr = grData,
                                                     isSelected = grData.grInfoId == selectedGrId,
                                                     onSelected = {
-                                                        selectedGrId = grData.grInfoId.toString()
+                                                        selectedGrId = grData.grInfoId.orEmpty()
                                                     }
                                                 )
                                             }

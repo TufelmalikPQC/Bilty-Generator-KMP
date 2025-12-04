@@ -1,11 +1,16 @@
 package com.bilty.generator.model.enums
 
+/**
+ * Status of a print job in the print queue system
+ * PENDING - Print job is queued and waiting to be printed
+ * COMPLETED - Print job was successfully printed
+ * FAILED - Print job failed due to an error
+ * CANCELLED - Print job was cancelled by user
+ */
 enum class PrintStatus {
-    NOT_STARTED,
-    PRINTING,
-    CANCELLED,
-    FAILED,
     PENDING,
-    NOT_SUPPORTED,
-    COMPLETED
+    PRINTING,
+    COMPLETED,
+    FAILED,
+    CANCELLED
 }

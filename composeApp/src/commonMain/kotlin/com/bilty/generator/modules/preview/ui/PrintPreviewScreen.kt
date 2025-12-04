@@ -45,6 +45,8 @@ import com.bilty.generator.modules.AppRoutes
 import com.bilty.generator.modules.preview.components.PreviewOptionsCard
 import com.bilty.generator.modules.print.ui.PrinterViewModel
 import com.bilty.generator.modules.printmethod.ui.TextBiltyFilePrintButtons
+import com.bilty.generator.modules.printqueue.PrintQueueViewModel
+import com.bilty.generator.modules.printqueue.PrintQueueOperationStatus
 import com.bilty.generator.uiToolKit.CommonDropdown
 import com.bilty.generator.uiToolKit.CommonRadioGroup
 import kotlinx.coroutines.launch
@@ -55,6 +57,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun PrintPreviewScreen(navController: NavHostController) {
     val viewModel = koinViewModel<PrinterViewModel>()
+    val printQueueViewModel = koinViewModel<PrintQueueViewModel>()
     val scope = rememberCoroutineScope()
 
     val orientationsList by viewModel.orientationsList.collectAsState()
@@ -65,6 +68,22 @@ fun PrintPreviewScreen(navController: NavHostController) {
     val selectedFontSize by viewModel.selectedFontSize.collectAsState()
     val selectedOrientation by viewModel.selectedOrientations.collectAsState()
     var selectedOption by remember { mutableStateOf<PrintOption?>(null) }
+    
+    val queueOperationStatus by printQueueViewModel.operationStatus.collectAsState()
+    
+    // Show snackbar or toast for queue operation status
+    when (queueOperationStatus) {
+        is PrintQueueOperationStatus.Success -> {
+            println("✅ ${(queueOperationStatus as PrintQueueOperationStatus.Success).message}")
+            // Clear status after showing
+            printQueueViewModel.resetOperationStatus()
+        }
+        is PrintQueueOperationStatus.Error -> {
+            println("❌ ${(queueOperationStatus as PrintQueueOperationStatus.Error).message}")
+            printQueueViewModel.resetOperationStatus()
+        }
+        else -> {}
+    }
 
     fun onConfirm(printWithImage: Boolean) {
         if (getPlatform().name.contains(Constants.Platforms.PLATFORM_WEB) ||

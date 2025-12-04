@@ -1,6 +1,7 @@
 package com.bilty.generator.di.repositoryModules
 
 import com.bilty.generator.modules.remotePrint.ui.SendPrintRequestRepository
+import com.bilty.generator.modules.printqueue.PrintQueueRepository
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
@@ -18,4 +19,11 @@ val repositoryModule = module {
      * Scope: Singleton - single instance throughout the app
      */
     singleOf(::SendPrintRequestRepository)
+    
+    /**
+     * PrintQueueRepository - Manages print queue with dual-node Firebase structure
+     * Dependencies: FirebasePrintQueueHelper (instantiated internally)
+     * Scope: Singleton - single instance throughout the app
+     */
+    singleOf(::PrintQueueRepository)
 }

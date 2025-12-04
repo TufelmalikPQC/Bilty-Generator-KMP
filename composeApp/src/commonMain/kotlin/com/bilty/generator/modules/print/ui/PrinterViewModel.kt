@@ -108,8 +108,6 @@ class PrinterViewModel(
                         PrintStatus.CANCELLED -> "Print cancelled."
                         PrintStatus.FAILED -> "Print failed."
                         PrintStatus.PENDING -> "Print pending."
-                        PrintStatus.NOT_SUPPORTED -> "Printing not supported on this platform."
-                        PrintStatus.NOT_STARTED -> "Not Started"
                         PrintStatus.PRINTING -> "Printing in progress..."
                     },
                     lastPrintStatus = status
@@ -172,8 +170,6 @@ class PrinterViewModel(
                         PrintStatus.CANCELLED -> "Print cancelled."
                         PrintStatus.FAILED -> "Print failed."
                         PrintStatus.PENDING -> "Print pending."
-                        PrintStatus.NOT_SUPPORTED -> "Printing not supported on this platform."
-                        PrintStatus.NOT_STARTED -> "Not Started"
                         PrintStatus.PRINTING -> "Printing in progress..."
                     },
                     lastPrintStatus = status

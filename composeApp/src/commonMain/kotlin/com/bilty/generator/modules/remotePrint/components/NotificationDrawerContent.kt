@@ -132,7 +132,7 @@ fun NotificationDrawerContent(
             ) {
                 items(
                     items = notifications,
-                    key = { it.grNo }
+                    key = { "${it.grNo}_${it.timestamp}" }
                 ) { notification ->
                     println("📋 NotificationDrawerContent: Rendering item GR=${notification.grNo}")
                     NotificationItem(
