@@ -1,4 +1,4 @@
-package com.bilty.generator.modules.printqueue
+package com.bilty.generator.repository
 
 import com.bilty.generator.model.data.PrintJob
 import com.bilty.generator.model.data.PrintRequestData
@@ -13,11 +13,11 @@ import kotlin.time.ExperimentalTime
 /**
  * Repository for managing print queue operations
  * Provides a clean API for ViewModels to interact with the Firebase print queue
- * 
+ *
  * Uses dual-node structure:
  * - printJobs/{fbNodeId} → Full print job data
  * - printIndex/{companyId}/{branchId}/{grNo} → Fast lookup index
- * 
+ *
  * @property firebaseHelper Firebase helper for low-level operations
  */
 class PrintQueueRepository {
@@ -26,7 +26,7 @@ class PrintQueueRepository {
     /**
      * Adds a new print job to the queue
      * Creates entries in both printJobs and printIndex nodes
-     * 
+     *
      * @param grNo The GR number (unique identifier)
      * @param printData The complete print data
      * @param companyId The company ID
@@ -44,7 +44,7 @@ class PrintQueueRepository {
         onFailure: (Exception) -> Unit
     ) {
         println("🔵 PrintQueueRepository.addToPrintQueue: GR=$grNo, company=$companyId, branch=$branchId")
-        
+
         val printJob = PrintJob(
             grNo = grNo,
             companyId = companyId,
@@ -53,7 +53,7 @@ class PrintQueueRepository {
             status = PrintStatus.PENDING,
             printData = printData
         )
-        
+
         firebaseHelper.addPrintJob(
             printJob = printJob,
             onSuccess = { fbNodeId ->
@@ -70,7 +70,7 @@ class PrintQueueRepository {
     /**
      * Updates the status of a print job
      * Updates both printJobs and printIndex nodes atomically
-     * 
+     *
      * @param fbNodeId The Firebase node ID in printJobs
      * @param grNo The GR number
      * @param companyId The company ID
@@ -89,7 +89,7 @@ class PrintQueueRepository {
         onFailure: (Exception) -> Unit
     ) {
         println("🔵 PrintQueueRepository.updatePrintStatus: fbNodeId=$fbNodeId, status=$newStatus")
-        
+
         firebaseHelper.updatePrintStatus(
             fbNodeId = fbNodeId,
             grNo = grNo,
@@ -110,7 +110,7 @@ class PrintQueueRepository {
     /**
      * Deletes a print job from the queue
      * Removes from both printJobs and printIndex nodes
-     * 
+     *
      * @param fbNodeId The Firebase node ID in printJobs
      * @param grNo The GR number
      * @param companyId The company ID
@@ -127,7 +127,7 @@ class PrintQueueRepository {
         onFailure: (Exception) -> Unit
     ) {
         println("🔵 PrintQueueRepository.deletePrintJob: fbNodeId=$fbNodeId, grNo=$grNo")
-        
+
         firebaseHelper.deletePrintJob(
             fbNodeId = fbNodeId,
             grNo = grNo,
@@ -147,11 +147,11 @@ class PrintQueueRepository {
     /**
      * Observes the print queue for a specific company and branch
      * Fetches full print job data by reading index and then fetching from printJobs
-     * 
+     *
      * Flow emits:
      * - When index changes (new job added, status updated, job deleted)
      * - List of all pending print jobs for the company/branch
-     * 
+     *
      * @param companyId The company ID to observe
      * @param branchId The branch ID to observe
      * @return Flow of list of PrintJob with their Firebase node IDs in a Pair
@@ -161,13 +161,13 @@ class PrintQueueRepository {
         branchId: String
     ): Flow<List<Pair<String, PrintJob>>> {
         println("🔵 PrintQueueRepository.observePrintQueue: company=$companyId, branch=$branchId")
-        
+
         return firebaseHelper.observePrintIndex(companyId, branchId)
             .map { indexMap ->
                 println("📦 PrintQueueRepository: Received index with ${indexMap.size} entries")
-                
+
                 val printJobs = mutableListOf<Pair<String, PrintJob>>()
-                
+
                 // Fetch full print job for each index entry
                 indexMap.forEach { (grNo, indexEntry) ->
                     val printJob = firebaseHelper.getPrintJobById(indexEntry.fbNodeId)
@@ -178,7 +178,7 @@ class PrintQueueRepository {
                         println("  ⚠️ Could not load full job for GR=$grNo (fbNodeId=${indexEntry.fbNodeId})")
                     }
                 }
-                
+
                 println("📦 PrintQueueRepository: Emitting ${printJobs.size} print jobs")
                 printJobs.toList()
             }
@@ -190,7 +190,7 @@ class PrintQueueRepository {
 
     /**
      * Fetches a single print job by its Firebase node ID
-     * 
+     *
      * @param fbNodeId The Firebase node ID
      * @return The PrintJob or null if not found
      */

@@ -10,6 +10,7 @@ import com.bilty.generator.model.data.PrintRequest
 import com.bilty.generator.model.data.SendPrintResponseStatus
 import com.bilty.generator.model.enums.PrintStatus
 import com.bilty.generator.model.enums.RateTypeEnum
+import com.bilty.generator.repository.SendPrintRequestRepository
 import com.bilty.generator.utils.extention.toNotificationItems
 import io.ktor.util.date.getTimeMillis
 import kotlinx.coroutines.Job

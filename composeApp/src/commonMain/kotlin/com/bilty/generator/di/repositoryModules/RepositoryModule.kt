@@ -1,7 +1,7 @@
 package com.bilty.generator.di.repositoryModules
 
-import com.bilty.generator.modules.remotePrint.ui.SendPrintRequestRepository
-import com.bilty.generator.modules.printqueue.PrintQueueRepository
+import com.bilty.generator.repository.SendPrintRequestRepository
+import com.bilty.generator.repository.PrintQueueRepository
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
